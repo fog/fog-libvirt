@@ -15,11 +15,3 @@ if Fog.mocking?
 else
   FOG_TESTING_TIMEOUT = Fog.timeout
 end
-
-def lorem_file
-  File.open(File.dirname(__FILE__) + '/lorem.txt', 'r')
-end
-
-def array_differences(array_a, array_b)
-  (array_a - array_b) | (array_b - array_a)
-end
