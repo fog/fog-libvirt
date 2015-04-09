@@ -3,12 +3,15 @@ require 'fog/xml'
 require 'fog/json'
 require 'libvirt'
 
-require 'fog/libvirt/version'
-require 'fog/libvirt/compute'
+require File.expand_path('../libvirt/version', __FILE__)
 
 module Fog
   module Libvirt
     extend Fog::Provider
+
+    module Compute
+      autoload :Libvirt, File.expand_path('../libvirt/compute', __FILE__)
+    end
 
     service(:compute, 'Compute')
   end
