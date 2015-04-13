@@ -42,6 +42,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency("yard")
   s.add_development_dependency("redcarpet")
 
-  s.files = `git ls-files`.split("\n")
+  # Let's not ship dot files and gemfiles
+  git_files = `git ls-files`.split("\n")
+  s.files = git_files.delete_if{ |f| f =~ /^\..*/ || f =~ /^gemfiles\/*/ }
   s.test_files = `git ls-files -- {spec,tests}/*`.split("\n")
 end
