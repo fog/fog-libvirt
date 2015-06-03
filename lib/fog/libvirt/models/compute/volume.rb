@@ -71,6 +71,11 @@ module Fog
           new_volume.reload
         end
 
+        def upload_image(file_path)
+          requires :pool_name
+          service.upload_volume(pool_name, name, file_path)
+        end
+
         private
 
         def image_suffix

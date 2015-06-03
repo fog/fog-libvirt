@@ -34,9 +34,14 @@ end
 #############################################################################
 
 GEM_NAME = "#{name}"
-task :default => :test
+task :default => [:test, :minitest]
 
-Rake::TestTask.new do |t|
+Rake::TestTask.new(:minitest) do |t|
+  t.libs << '.'
+  t.libs << 'lib'
+  t.libs << 'minitests'
+  t.test_files  =  Dir.glob('minitests/**/*_test.rb')
+  t.verbose = true
 end
 
 desc 'Run tests'
