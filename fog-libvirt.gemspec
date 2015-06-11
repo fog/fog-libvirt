@@ -27,6 +27,10 @@ Gem::Specification.new do |s|
   s.add_dependency("fog-json")
   s.add_dependency("fog-xml", "~> 0.1.1")
   s.add_dependency('ruby-libvirt','~> 0.5.0')
+  s.add_dependency('mime-types','< 2.0') if RUBY_VERSION < '1.9'
+  s.add_dependency('nokogiri', '< 1.6') if RUBY_VERSION < '1.9'
+  s.add_dependency('octokit', '< 3.0') if RUBY_VERSION < '1.9'
+  s.add_dependency('rest-client', '<= 1.7.0') if RUBY_VERSION < '1.9'
 
   # Fedora and derivates need explicit require
   s.add_dependency("json")
@@ -38,9 +42,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("rubocop") if RUBY_VERSION > "1.9"
   s.add_development_dependency("shindo", "~> 0.3.4")
   s.add_development_dependency("simplecov")
-  s.add_development_dependency("thor")
   s.add_development_dependency("yard")
-  s.add_development_dependency("redcarpet")
 
   # Let's not ship dot files and gemfiles
   git_files = `git ls-files`.split("\n")

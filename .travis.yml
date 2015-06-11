@@ -1,6 +1,10 @@
 language: ruby
 
-sudo: false
+sudo: required
+
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -y libvirt-dev
 
 script: bundle exec rake
 
@@ -23,15 +27,6 @@ matrix:
       gemfile: Gemfile
     - rvm: 2.2.0
       gemfile: gemfiles/Gemfile-edge
-    - rvm: jruby-18mode
-      gemfile: gemfiles/Gemfile-ruby-1.8.7
-    - rvm: jruby-19mode
-      gemfile: Gemfile
-    - rvm: jruby-head
-      gemfile: Gemfile
-
-  allow_failures:
-    - rvm: jruby-head
 
 notifications:
   email: false
