@@ -54,5 +54,4 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
     end
     test('be a kind of Fog::Compute::Libvirt::Server') { server.kind_of? Fog::Compute::Libvirt::Server }
   end
-
 end

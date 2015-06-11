@@ -36,6 +36,7 @@ module Fog
       request :list_volumes
       request :volume_action
       request :create_volume
+      request :upload_volume
       request :clone_volume
       request :list_networks
       request :destroy_network

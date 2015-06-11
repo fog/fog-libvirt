@@ -1,6 +1,7 @@
 require 'fog/compute/models/server'
 require 'fog/libvirt/models/compute/util/util'
 require 'net/ssh/proxy/command'
+require 'fileutils'
 
 module Fog
   module Compute
@@ -36,6 +37,7 @@ module Fog
         attr_accessor :network_interface_type ,:network_nat_network, :network_bridge_name
         attr_accessor :volume_format_type, :volume_allocation,:volume_capacity, :volume_name, :volume_pool_name, :volume_template_name, :volume_path
         attr_accessor :password
+        attr_accessor :user_data
 
         # Can be created by passing in :xml => "<xml to create domain/server>"
         # or by providing :template_options => {
@@ -48,6 +50,7 @@ module Fog
           super defaults.merge(attributes)
           initialize_nics
           initialize_volumes
+          @user_data = attributes.delete(:user_data)
         end
 
         def new?
@@ -57,6 +60,7 @@ module Fog
         def save
           raise Fog::Errors::Error.new('Saving an existing server may create a duplicate') unless new?
           create_or_clone_volume unless xml or @volumes
+          create_user_data_iso if user_data
           @xml ||= to_xml
           self.id = (persistent ? service.define_domain(xml) : service.create_domain(xml)).uuid
           reload
@@ -213,6 +217,35 @@ module Fog
         def vnc_port
           Fog::Logger.deprecation("#{self.class} => #vnc_port is deprecated, use #display[:port] instead [light_black](#{caller.first})[/]")
           display[:port]
+        end
+
+        def generate_config_iso(user_data, &blk)
+          Dir.mktmpdir('config') do |wd|
+            generate_config_iso_in_dir(wd, user_data, &blk)
+          end
+        end
+
+        def generate_config_iso_in_dir(dir_path, user_data, &blk)
+          FileUtils.touch(File.join(dir_path, "meta-data"))
+          File.open(File.join(dir_path, 'user-data'), 'w') { |f| f.write user_data }
+
+          isofile = Tempfile.new(['init', '.iso']).path
+          unless system("genisoimage -output #{isofile} -volid cidata -joliet -rock #{File.join(dir_path, 'user-data')} #{File.join(dir_path, 'meta-data')}")
+            raise Fog::Errors::Error("Couldn't generate cloud-init iso disk.")
+          end
+          blk.call(isofile)
+        end
+
+        def create_user_data_iso
+          generate_config_iso(user_data) do |iso|
+            vol = service.volumes.create(:name => cloud_init_volume_name, :capacity => "#{File.size(iso)}b", :allocation => "0G")
+            vol.upload_image(iso)
+            @iso_file = cloud_init_volume_name
+          end
+        end
+
+        def cloud_init_volume_name
+          "#{name}-cloud-init.iso"
         end
 
         private
