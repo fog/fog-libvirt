@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("shindo", "~> 0.3.4")
   s.add_development_dependency("simplecov")
   s.add_development_dependency("yard")
-  s.add_development_dependency("mocha")
+  s.add_development_dependency("mocha", "~> 1.1.0")
 
   # Let's not ship dot files and gemfiles
   git_files = `git ls-files`.split("\n")
