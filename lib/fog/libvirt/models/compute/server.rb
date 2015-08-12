@@ -434,7 +434,7 @@ module Fog
             template_volume = service.volumes.all(:name => volume_template_name).first
             raise Fog::Errors::Error.new("Template #{volume_template_name} not found") unless template_volume
             begin
-              volume = template_volume.clone("#{options[:name]}")
+              volume = template_volume.clone_volume("#{options[:name]}")
             rescue => e
               raise Fog::Errors::Error.new("Error creating the volume : #{e}")
             end

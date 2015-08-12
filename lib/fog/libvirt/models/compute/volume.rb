@@ -69,6 +69,7 @@ module Fog
           new_volume.key  = nil
           new_volume.name = new_name
           new_volume.path = service.clone_volume(pool_name, new_volume.to_xml, self.name).path
+          new_volume.id   = new_volume.path
 
           new_volume.reload
         end
