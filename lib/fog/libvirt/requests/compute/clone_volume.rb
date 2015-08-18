@@ -10,7 +10,10 @@ module Fog
 
       class Mock
         def clone_volume(pool_name, new_pool_name, xml, name)
-          Fog::Compute::Libvirt::Volume.new({:pool_name => new_pool_name, :xml => xml})
+          Fog::Compute::Libvirt::Volume.new({:pool_name => new_pool_name,
+                                             :xml => xml,
+                                             :name => name,
+                                             :path => [new_pool_name, name, 'path'].join('.')})
         end
       end
     end
