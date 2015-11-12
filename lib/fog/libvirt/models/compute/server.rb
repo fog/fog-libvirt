@@ -1,6 +1,5 @@
 require 'fog/compute/models/server'
 require 'fog/libvirt/models/compute/util/util'
-require 'net/ssh/proxy/command'
 require 'fileutils'
 
 module Fog
@@ -157,6 +156,12 @@ module Fog
         end
 
         def ssh_proxy
+          begin
+            require 'net/ssh/proxy/command'
+          rescue LoadError
+            Fog::Logger.warning("'net/ssh' missing, please install and try again.")
+            exit(1)
+          end
           # if this is a direct connection, we don't need a proxy to be set.
           return nil unless connection.uri.ssh_enabled?
           user_string= service.uri.user ? "-l #{service.uri.user}" : ""
