@@ -40,6 +40,7 @@ module Fog
       request :clone_volume
       request :list_networks
       request :destroy_network
+      request :dhcp_leases
       request :list_interfaces
       request :destroy_interface
       request :get_node_info
