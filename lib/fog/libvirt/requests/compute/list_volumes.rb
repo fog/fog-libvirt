@@ -22,16 +22,20 @@ module Fog
           format_type = xml_element(vol.xml_desc, "/volume/target/format", "type") rescue nil # not all volumes have types, e.g. LVM
           return nil if format_type == "dir"
 
-          {
-            :pool_name   => vol.pool.name,
-            :key         => vol.key,
-            :id          => vol.key,
-            :path        => vol.path,
-            :name        => vol.name,
-            :format_type => format_type,
-            :allocation  => bytes_to_gb(vol.info.allocation),
-            :capacity    => bytes_to_gb(vol.info.capacity),
-          }
+          begin
+              {
+                :pool_name   => vol.pool.name,
+                :key         => vol.key,
+                :id          => vol.key,
+                :path        => vol.path,
+                :name        => vol.name,
+                :format_type => format_type,
+                :allocation  => bytes_to_gb(vol.info.allocation),
+                :capacity    => bytes_to_gb(vol.info.capacity),
+              }
+          rescue Libvirt::RetrieveError
+            return nil # If there are issues during stat of volume file
+          end
         end
 
         def bytes_to_gb bytes
