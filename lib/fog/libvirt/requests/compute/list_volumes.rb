@@ -31,7 +31,7 @@ module Fog
             :format_type => format_type,
             :allocation  => bytes_to_gb(vol.info.allocation),
             :capacity    => bytes_to_gb(vol.info.capacity),
-          }
+          } rescue nil # If there are issues during stat of volume file
         end
 
         def bytes_to_gb bytes
