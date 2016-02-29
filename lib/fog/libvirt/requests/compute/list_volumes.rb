@@ -7,7 +7,13 @@ module Fog
           if filter.keys.empty?
             raw_volumes do |pool|
               pool.list_volumes.each do |volume_name|
-                data << volume_to_attributes(pool.lookup_volume_by_name(volume_name))
+                begin
+                  data << volume_to_attributes(pool.lookup_volume_by_name(volume_name))
+                rescue ::Libvirt::RetrieveError
+                  # Catch libvirt exceptions to avoid race conditions involving
+                  # concurrent libvirt operations (like from another process)
+                  next
+                end
               end
             end
           else
@@ -33,7 +39,7 @@ module Fog
                 :allocation  => bytes_to_gb(vol.info.allocation),
                 :capacity    => bytes_to_gb(vol.info.capacity),
               }
-          rescue Libvirt::RetrieveError
+          rescue ::Libvirt::RetrieveError, ::Libvirt::Error
             return nil # If there are issues during stat of volume file
           end
         end

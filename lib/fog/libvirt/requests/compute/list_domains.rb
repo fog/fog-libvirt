@@ -13,7 +13,7 @@ module Fog
             client.list_defined_domains.each { |name| data << client.lookup_domain_by_name(name) } unless filter[:defined] == false
             client.list_domains.each { |id| data << client.lookup_domain_by_id(id) } unless filter[:active] == false
           end
-          data.compact.map { |d| domain_to_attributes d }
+          data.compact.map { |d| domain_to_attributes d }.compact
         end
       end
 
@@ -51,23 +51,30 @@ module Fog
 
         def domain_to_attributes(dom)
           states= %w(nostate running blocked paused shutting-down shutoff crashed)
-          {
-            :id              => dom.uuid,
-            :uuid            => dom.uuid,
-            :name            => dom.name,
-            :max_memory_size => dom.info.max_mem,
-            :cputime         => dom.info.cpu_time,
-            :memory_size     => dom.info.memory,
-            :cpus            => dom.info.nr_virt_cpu,
-            :autostart       => dom.autostart?,
-            :os_type         => dom.os_type,
-            :active          => dom.active?,
-            :display         => domain_display(dom.xml_desc),
-            :boot_order      => boot_order(dom.xml_desc),
-            :nics            => domain_interfaces(dom.xml_desc),
-            :volumes_path    => domain_volumes(dom.xml_desc),
-            :state           => states[dom.info.state]
-          }
+
+          begin
+            {
+              :id              => dom.uuid,
+              :uuid            => dom.uuid,
+              :name            => dom.name,
+              :max_memory_size => dom.info.max_mem,
+              :cputime         => dom.info.cpu_time,
+              :memory_size     => dom.info.memory,
+              :cpus            => dom.info.nr_virt_cpu,
+              :autostart       => dom.autostart?,
+              :os_type         => dom.os_type,
+              :active          => dom.active?,
+              :display         => domain_display(dom.xml_desc),
+              :boot_order      => boot_order(dom.xml_desc),
+              :nics            => domain_interfaces(dom.xml_desc),
+              :volumes_path    => domain_volumes(dom.xml_desc),
+              :state           => states[dom.info.state]
+            }
+          rescue ::Libvirt::RetrieveError, ::Libvirt::Error
+            # Catch libvirt exceptions to avoid race conditions involving
+            # concurrent libvirt operations (like from another process)
+            return nil
+          end
         end
       end
 
