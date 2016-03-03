@@ -16,6 +16,10 @@ module Fog
           super
         end
 
+        def dhcp_leases(mac, flags = 0)
+          service.dhcp_leases(uuid, mac, flags)
+        end
+
         def save
           raise Fog::Errors::Error.new('Creating a new network is not yet implemented. Contributions welcome!')
         end

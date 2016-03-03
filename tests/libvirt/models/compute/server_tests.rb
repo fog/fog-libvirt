@@ -20,6 +20,9 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         }
       end
     end
+    tests('have an ip_address action that') do
+      test('returns the latest IP address lease') { server.public_ip_address() == '1.2.5.6' }
+    end
     tests('have attributes') do
       model_attribute_hash = server.attributes
       attributes = [ :id,
