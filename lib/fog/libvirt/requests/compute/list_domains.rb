@@ -10,8 +10,25 @@ module Fog
           elsif filter.key?(:name)
             data << client.lookup_domain_by_name(filter[:name])
           else
-            client.list_defined_domains.each { |name| data << client.lookup_domain_by_name(name) } unless filter[:defined] == false
-            client.list_domains.each { |id| data << client.lookup_domain_by_id(id) } unless filter[:active] == false
+            client.list_defined_domains.each { |name|
+              begin
+                data << client.lookup_domain_by_name(name)
+              rescue ::Libvirt::RetrieveError, ::Libvirt::Error
+                # Catch libvirt exceptions to avoid race conditions involving
+                # concurrent libvirt operations (like from another process)
+                next
+              end
+            } unless filter[:defined] == false
+
+            client.list_domains.each { |id|
+              begin
+               data << client.lookup_domain_by_id(id)
+              rescue ::Libvirt::RetrieveError, ::Libvirt::Error
+                # Catch libvirt exceptions to avoid race conditions involving
+                # concurrent libvirt operations (like from another process)
+                next
+              end
+            } unless filter[:active] == false
           end
           data.compact.map { |d| domain_to_attributes d }.compact
         end
