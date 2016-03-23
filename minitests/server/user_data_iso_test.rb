@@ -61,6 +61,17 @@ class UserDataIsoTest < Minitest::Test
     assert_equal @server.cloud_init_volume_name, @server.iso_file
   end
 
+  def test_iso_dir_is_set_during_user_data_iso_generation
+    @server.stubs(:system).returns(true)
+    volume = @compute.volumes.new
+    volume.stubs(:path).returns("/srv/libvirt/#{@server.cloud_init_volume_name}")
+    Fog::Compute::Libvirt::Volumes.any_instance.stubs(:create).returns(volume)
+    Fog::Compute::Libvirt::Volume.any_instance.stubs(:upload_image)
+
+    @server.create_user_data_iso
+    assert_equal '/srv/libvirt', @server.iso_dir
+  end
+
   def in_a_temp_dir
     Dir.mktmpdir('test-dir') do |d|
       yield d
