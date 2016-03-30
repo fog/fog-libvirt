@@ -266,7 +266,7 @@ module Fog
           ip_address = nil
           nic = self.nics.find {|nic| nic.mac==mac}
           if !nic.nil?
-            Fog::Compute[:libvirt].networks.all.each do |net|
+            service.networks.all.each do |net|
               if net.name == nic.network
                 leases = net.dhcp_leases(mac, 0)
                 # Assume the lease expiring last is the current IP address
