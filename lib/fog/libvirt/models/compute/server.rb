@@ -246,6 +246,7 @@ module Fog
             vol = service.volumes.create(:name => cloud_init_volume_name, :capacity => "#{File.size(iso)}b", :allocation => "0G")
             vol.upload_image(iso)
             @iso_file = cloud_init_volume_name
+            @iso_dir = File.dirname(vol.path) if vol.path
           end
         end
 
