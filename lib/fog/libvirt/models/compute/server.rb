@@ -351,6 +351,10 @@ module Fog
           }
         end
 
+        def valid_boot_media
+          %w[cdrom fd hd network]
+        end
+
         def default_boot_order
           %w[hd cdrom network]
         end
@@ -358,7 +362,7 @@ module Fog
         def verify_boot_order order = []
           if order
             order.each do |b|
-              raise "invalid boot order, possible values are: hd, network and/or cdrom" unless default_boot_order.include?(b)
+              raise "invalid boot order, possible values are any combination of: #{valid_boot_media.join(', ')}" unless valid_boot_media.include?(b)
             end
           end
         end
