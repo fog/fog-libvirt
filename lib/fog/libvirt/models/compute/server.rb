@@ -346,20 +346,13 @@ module Fog
             :network_interface_type => "network",
             :network_nat_network    => "default",
             :network_bridge_name    => "br0",
-            :boot_order             => default_boot_order,
+            :boot_order             => %w[hd cdrom network],
             :display                => default_display
           }
         end
 
-        def valid_boot_media
-          %w[cdrom fd hd network]
-        end
-
-        def default_boot_order
-          %w[hd cdrom network]
-        end
-
         def verify_boot_order order = []
+          valid_boot_media = %w[cdrom fd hd network]
           if order
             order.each do |b|
               raise "invalid boot order, possible values are any combination of: #{valid_boot_media.join(', ')}" unless valid_boot_media.include?(b)
