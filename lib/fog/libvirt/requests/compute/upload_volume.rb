@@ -11,7 +11,7 @@ module Fog
           stream.sendall do |_opaque, n|
             begin
               r = image_file.read(n)
-              [r.length < n ? 0 : r.length, r]
+              r ? [r.length, r] : [0, ""]
             rescue Exception => e
               [-1, ""]
             end
