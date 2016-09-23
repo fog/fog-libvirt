@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency("fog-core", "~> 1.27", ">= 1.27.4")
   s.add_dependency("fog-json")
   s.add_dependency("fog-xml", "~> 0.1.1")
-  s.add_dependency('ruby-libvirt','>= 0.5.0', '< 0.7.0')
+  s.add_dependency('ruby-libvirt','>= 0.7.0')
   s.add_dependency('mime-types','< 2.0') if RUBY_VERSION < '1.9'
   s.add_dependency('nokogiri', '< 1.6') if RUBY_VERSION < '1.9'
   s.add_dependency('octokit', '< 3.0') if RUBY_VERSION < '1.9'
