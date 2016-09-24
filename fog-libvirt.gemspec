@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency('nokogiri', '< 1.6') if RUBY_VERSION < '1.9'
   s.add_dependency('octokit', '< 3.0') if RUBY_VERSION < '1.9'
   s.add_dependency('rest-client', '<= 1.7.0') if RUBY_VERSION < '1.9'
+  s.add_dependency("tins", "<= 1.6.0") if RUBY_VERSION < "1.9"
 
   # Fedora and derivates need explicit require.
   # Also we cannot use newer JSON on Ruby 1.8 & 1.9.
