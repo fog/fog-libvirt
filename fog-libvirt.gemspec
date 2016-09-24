@@ -32,8 +32,13 @@ Gem::Specification.new do |s|
   s.add_dependency('octokit', '< 3.0') if RUBY_VERSION < '1.9'
   s.add_dependency('rest-client', '<= 1.7.0') if RUBY_VERSION < '1.9'
 
-  # Fedora and derivates need explicit require
-  s.add_dependency("json")
+  # Fedora and derivates need explicit require.
+  # Also we cannot use newer JSON on Ruby 1.8 & 1.9.
+  if RUBY_VERSION < '2.0'
+    s.add_dependency("json", '< 2.0')
+  else
+    s.add_dependency("json")
+  end
 
   s.add_development_dependency("minitest")
   s.add_development_dependency("minitest-stub-const")
