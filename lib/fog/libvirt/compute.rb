@@ -57,11 +57,11 @@ module Fog
           require 'libvirt'
         end
 
-        private
-
         def client
           return @client if defined?(@client)
         end
+
+        private
 
         #read mocks xml
         def read_xml(file_name)

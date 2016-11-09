@@ -258,11 +258,134 @@ module Fog
         private
         attr_accessor :volumes_path
 
-        # This retrieves the ip address of the mac address
+        # This tests the library version before redefining the address
+        # method for this instance to use a method compatible with
+        # earlier libvirt libraries, or uses the dhcp method from more
+        # recent releases.
+        def addresses(service_arg=service, options={})
+          addresses_method = self.method(:addresses_dhcp)
+          # check if ruby-libvirt was compiled against a new enough version
+          # that can use dhcp_leases, as otherwise it will not provide the
+          # method dhcp_leases on any of the network objects.
+          has_dhcp_leases = true
+          begin
+            service.networks.first.dhcp_leases(self.mac)
+          rescue NoMethodError
+            has_dhcp_leases = false
+          rescue
+            # assume some other odd exception.
+          end
+
+          # if ruby-libvirt not compiled with support, or remote library is
+          # too old (must be newer than 1.2.8), then use old fallback
+          if not has_dhcp_leases or service.client.libversion < 1002008
+            addresses_method = self.method(:addresses_ip_command)
+          end
+
+          # replace current definition for this instance with correct one for
+          # detected libvirt to perform check once for connection
+          (class << self; self; end).class_eval do
+            define_method(:addresses, addresses_method)
+          end
+          addresses(service_arg, options)
+        end
+
+        # This retrieves the ip address of the mac address using ip_command
         # It returns an array of public and private ip addresses
         # Currently only one ip address is returned, but in the future this could be multiple
         # if the server has multiple network interface
-        def addresses(service_arg=service, options={})
+        def addresses_ip_command(service_arg=service, options={})
+          mac=self.mac
+
+          # Aug 24 17:34:41 juno arpwatch: new station 10.247.4.137 52:54:00:88:5a:0a eth0.4
+          # Aug 24 17:37:19 juno arpwatch: changed ethernet address 10.247.4.137 52:54:00:27:33:00 (52:54:00:88:5a:0a) eth0.4
+          # Check if another ip_command string was provided
+          ip_command_global=service_arg.ip_command.nil? ? 'grep $mac /var/log/arpwatch.log|sed -e "s/new station//"|sed -e "s/changed ethernet address//g" |sed -e "s/reused old ethernet //" |tail -1 |cut -d ":" -f 4-| cut -d " " -f 3' : service_arg.ip_command
+          ip_command_local=options[:ip_command].nil? ? ip_command_global : options[:ip_command]
+
+          ip_command="mac=#{mac}; server_name=#{name}; "+ip_command_local
+
+          ip_address=nil
+
+          if service_arg.uri.ssh_enabled?
+
+            # Retrieve the parts we need from the service to setup our ssh options
+            user=service_arg.uri.user #could be nil
+            host=service_arg.uri.host
+            keyfile=service_arg.uri.keyfile
+            port=service_arg.uri.port
+
+            # Setup the options
+            ssh_options={}
+            ssh_options[:keys]=[ keyfile ] unless keyfile.nil?
+            ssh_options[:port]=port unless keyfile.nil?
+            ssh_options[:paranoid]=true if service_arg.uri.no_verify?
+
+            begin
+              result=Fog::SSH.new(host, user, ssh_options).run(ip_command)
+            rescue Errno::ECONNREFUSED
+              raise Fog::Errors::Error.new("Connection was refused to host #{host} to retrieve the ip_address for #{mac}")
+            rescue Net::SSH::AuthenticationFailed
+              raise Fog::Errors::Error.new("Error authenticating over ssh to host #{host} and user #{user}")
+            end
+
+            # Check for a clean exit code
+            if result.first.status == 0
+              ip_address=result.first.stdout.strip
+            else
+              # We got a failure executing the command
+              raise Fog::Errors::Error.new("The command #{ip_command} failed to execute with a clean exit code")
+            end
+
+          else
+            # It's not ssh enabled, so we assume it is
+            if service_arg.uri.transport=="tls"
+              raise Fog::Errors::Error.new("TlS remote transport is not currently supported, only ssh")
+            end
+
+            # Execute the ip_command locally
+            # Initialize empty ip_address string
+            ip_address=""
+
+            IO.popen("#{ip_command}") do |p|
+              p.each_line do |l|
+                ip_address+=l
+              end
+              status=Process.waitpid2(p.pid)[1].exitstatus
+              if status!=0
+                raise Fog::Errors::Error.new("The command #{ip_command} failed to execute with a clean exit code")
+              end
+            end
+
+            #Strip any new lines from the string
+            ip_address=ip_address.chomp
+          end
+
+          # The Ip-address command has been run either local or remote now
+
+          if ip_address==""
+            #The grep didn't find an ip address result"
+            ip_address=nil
+          else
+            # To be sure that the command didn't return another random string
+            # We check if the result is an actual ip-address
+            # otherwise we return nil
+            unless ip_address=~/^(\d{1,3}\.){3}\d{1,3}$/
+              raise Fog::Errors::Error.new(
+                        "The result of #{ip_command} does not have valid ip-address format\n"+
+                            "Result was: #{ip_address}\n"
+                    )
+            end
+          end
+
+          return { :public => [ip_address], :private => [ip_address]}
+        end
+
+        # This retrieves the ip address of the mac address using dhcp_leases
+        # It returns an array of public and private ip addresses
+        # Currently only one ip address is returned, but in the future this could be multiple
+        # if the server has multiple network interface
+        def addresses_dhcp(service_arg=service, options={})
           mac=self.mac
 
           ip_address = nil
