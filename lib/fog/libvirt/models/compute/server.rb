@@ -236,7 +236,7 @@ module Fog
 
           isofile = Tempfile.new(['init', '.iso']).path
           unless system("genisoimage -output #{isofile} -volid cidata -joliet -rock #{File.join(dir_path, 'user-data')} #{File.join(dir_path, 'meta-data')}")
-            raise Fog::Errors::Error("Couldn't generate cloud-init iso disk.")
+            raise Fog::Errors::Error.new("Couldn't generate cloud-init iso disk with genisoimage.")
           end
           blk.call(isofile)
         end
