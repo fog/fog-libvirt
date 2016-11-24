@@ -21,3 +21,4 @@
 * Steve Smith <github@scsworld.co.uk>
 * Vincent Demeester <vincent+git@demeester.fr>
 * Wesley Beary <geemus@gmail.com>
+* Tomer Brisker <tbrisker@redhat.com>
