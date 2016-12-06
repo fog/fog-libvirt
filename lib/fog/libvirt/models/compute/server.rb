@@ -186,7 +186,7 @@ module Fog
 
           credentials[:proxy]= ssh_proxy unless ssh_proxy.nil?
           credentials[:password] = password unless self.password.nil?
-          credentails[:key_data] = [private_key] if self.private_key
+          credentials[:key_data] = [private_key] if self.private_key
 
           commands = [
             %{mkdir .ssh},
