@@ -27,6 +27,7 @@ module Fog
         attribute :active
         attribute :boot_order
         attribute :display
+        attribute :cpu
 
         attribute :state
 
@@ -347,7 +348,8 @@ module Fog
             :network_nat_network    => "default",
             :network_bridge_name    => "br0",
             :boot_order             => %w[hd cdrom network],
-            :display                => default_display
+            :display                => default_display,
+            :cpu                    => {}
           }
         end
 

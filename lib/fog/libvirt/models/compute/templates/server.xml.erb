@@ -13,6 +13,23 @@
     <apic/>
     <pae/>
   </features>
+<% if !cpu.empty? -%>
+<% if cpu[:mode] -%>
+  <cpu mode='<%= cpu[:mode] %>'>
+<% else -%>
+  <cpu>
+<% end -%>
+<%
+  fallback = 'allow'
+  model = ''
+  if cpu[:model]
+    fallback = cpu[:model][:fallback] if cpu[:model][:fallback]
+    model    = cpu[:model][:name]     if cpu[:model][:name]
+  end
+-%>
+    <model fallback='<%= fallback %>'><%= model %></model>
+  </cpu>
+<% end -%>
   <clock offset='utc'/>
   <devices>
 <% volumes.each do |vol| -%>
