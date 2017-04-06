@@ -6,7 +6,15 @@ module Fog
           data=[]
           if filter.keys.empty?
             (client.list_networks + client.list_defined_networks).each do |network_name|
-              data << network_to_attributes(client.lookup_network_by_name(network_name))
+              begin
+                data << network_to_attributes(client.lookup_network_by_name(network_name))
+              rescue => error
+                if error.message =~ /Network not found/
+                  next # Network no longer exists, skip over and carry on.
+                else
+                  raise error
+                end
+              end
             end
           else
             data = [network_to_attributes(get_network_by_filter(filter))]
