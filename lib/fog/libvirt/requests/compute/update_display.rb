@@ -13,7 +13,8 @@ module Fog
           display[:listen] = options[:listen].to_s   if options[:listen]
           display[:passwd] = options[:password].to_s if options[:password]
           display[:autoport] = 'yes' if display[:port] == '-1'
-          display[:keymap] = options[:keymap] || xml_elements(domain.xml_desc, "graphics", "keymap")
+          new_keymap       = options[:keymap] || xml_elements(domain.xml_desc, "graphics", "keymap")[0]
+          display[:keymap] = new_keymap unless new_keymap.nil?
 
           builder = Nokogiri::XML::Builder.new { graphics_ (display) }
           xml     = Nokogiri::XML(builder.to_xml).root.to_s
