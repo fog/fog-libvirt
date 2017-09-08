@@ -42,6 +42,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         :volumes,
         :active,
         :boot_order,
+        :hugepages,
         :state]
       tests("The server model should respond to") do
         attributes.each do |attribute|

@@ -28,6 +28,7 @@ module Fog
         attribute :boot_order
         attribute :display
         attribute :cpu
+        attribute :hugepages
 
         attribute :state
 
@@ -477,7 +478,8 @@ module Fog
             :network_bridge_name    => "br0",
             :boot_order             => %w[hd cdrom network],
             :display                => default_display,
-            :cpu                    => {}
+            :cpu                    => {},
+            :hugepages              => false,
           }
         end
 
