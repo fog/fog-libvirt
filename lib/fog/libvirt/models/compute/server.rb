@@ -28,6 +28,7 @@ module Fog
         attribute :boot_order
         attribute :display
         attribute :cpu
+        attribute :hugepages
 
         attribute :state
 

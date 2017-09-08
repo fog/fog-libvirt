@@ -1,6 +1,11 @@
 <domain type='<%= domain_type %>'>
   <name><%= name %></name>
   <memory><%= memory_size %></memory>
+<% if !hugepages.empty? -%>
+  <memoryBacking>
+    <hugepages/>
+  </memoryBacking>
+<% end -%>
   <vcpu><%= cpus %></vcpu>
   <os>
     <type arch='<%= arch %>'><%= os_type %></type>
