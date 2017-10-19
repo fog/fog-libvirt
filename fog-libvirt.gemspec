@@ -23,23 +23,13 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.extra_rdoc_files = %w[README.md]
 
+  s.required_ruby_version = '>= 2.0.0'
+
   s.add_dependency("fog-core", "~> 1.27", ">= 1.27.4")
   s.add_dependency("fog-json")
   s.add_dependency("fog-xml", "~> 0.1.1")
   s.add_dependency('ruby-libvirt','>= 0.7.0')
-  s.add_dependency('mime-types','< 2.0') if RUBY_VERSION < '1.9'
-  s.add_dependency('nokogiri', '< 1.6') if RUBY_VERSION < '1.9'
-  s.add_dependency('octokit', '< 3.0') if RUBY_VERSION < '1.9'
-  s.add_dependency('rest-client', '<= 1.7.0') if RUBY_VERSION < '1.9'
-  s.add_dependency("tins", "<= 1.6.0") if RUBY_VERSION < "1.9"
-
-  # Fedora and derivates need explicit require.
-  # Also we cannot use newer JSON on Ruby 1.8 & 1.9.
-  if RUBY_VERSION < '2.0'
-    s.add_dependency("json", '< 2.0')
-  else
-    s.add_dependency("json")
-  end
+  s.add_dependency("json")
 
   s.add_development_dependency("minitest")
   s.add_development_dependency("minitest-stub-const")
