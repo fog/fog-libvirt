@@ -278,7 +278,7 @@ module Fog
 
           # if ruby-libvirt not compiled with support, or remote library is
           # too old (must be newer than 1.2.8), then use old fallback
-          if not has_dhcp_leases or service.client.libversion < 1002008
+          if not has_dhcp_leases or service.libversion() < 1002008
             addresses_method = self.method(:addresses_ip_command)
           end
 

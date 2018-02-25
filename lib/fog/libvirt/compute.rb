@@ -45,6 +45,7 @@ module Fog
       request :destroy_interface
       request :get_node_info
       request :update_display
+      request :libversion
 
       module Shared
         include Fog::Compute::LibvirtUtil
@@ -57,11 +58,11 @@ module Fog
           require 'libvirt'
         end
 
+        private
+
         def client
           return @client if defined?(@client)
         end
-
-        private
 
         #read mocks xml
         def read_xml(file_name)
