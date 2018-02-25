@@ -290,6 +290,56 @@ module Fog
           addresses(service_arg, options)
         end
 
+        def ssh_ip_command(command, uri = {})
+
+          # Retrieve the parts we need from the service to setup our ssh options
+          user=uri.user #could be nil
+          host=uri.host
+          keyfile=uri.keyfile
+          port=uri.port
+
+          # Setup the options
+          ssh_options={}
+          ssh_options[:keys]=[ keyfile ] unless keyfile.nil?
+          ssh_options[:port]=port unless keyfile.nil?
+          ssh_options[:paranoid]=true if uri.no_verify?
+
+          begin
+            result=Fog::SSH.new(host, user, ssh_options).run(ip_command)
+          rescue Errno::ECONNREFUSED
+            raise Fog::Errors::Error.new("Connection was refused to host #{host} to retrieve the ip_address for #{mac}")
+          rescue Net::SSH::AuthenticationFailed
+            raise Fog::Errors::Error.new("Error authenticating over ssh to host #{host} and user #{user}")
+          end
+
+          # Check for a clean exit code
+          if result.first.status == 0
+            return result.first.stdout.strip
+          else
+            # We got a failure executing the command
+            raise Fog::Errors::Error.new("The command #{ip_command} failed to execute with a clean exit code")
+          end
+        end
+
+        def local_ip_command(command)
+          # Execute the ip_command locally
+          # Initialize empty ip_address string
+          ip_address=""
+
+          IO.popen("#{ip_command}") do |p|
+            p.each_line do |l|
+              ip_address+=l
+            end
+            status=Process.waitpid2(p.pid)[1].exitstatus
+            if status!=0
+              raise Fog::Errors::Error.new("The command #{ip_command} failed to execute with a clean exit code")
+            end
+          end
+
+          #Strip any new lines from the string
+          ip_address.chomp
+        end
+
         # This retrieves the ip address of the mac address using ip_command
         # It returns an array of public and private ip addresses
         # Currently only one ip address is returned, but in the future this could be multiple
@@ -308,57 +358,13 @@ module Fog
           ip_address=nil
 
           if service_arg.uri.ssh_enabled?
-
-            # Retrieve the parts we need from the service to setup our ssh options
-            user=service_arg.uri.user #could be nil
-            host=service_arg.uri.host
-            keyfile=service_arg.uri.keyfile
-            port=service_arg.uri.port
-
-            # Setup the options
-            ssh_options={}
-            ssh_options[:keys]=[ keyfile ] unless keyfile.nil?
-            ssh_options[:port]=port unless keyfile.nil?
-            ssh_options[:paranoid]=true if service_arg.uri.no_verify?
-
-            begin
-              result=Fog::SSH.new(host, user, ssh_options).run(ip_command)
-            rescue Errno::ECONNREFUSED
-              raise Fog::Errors::Error.new("Connection was refused to host #{host} to retrieve the ip_address for #{mac}")
-            rescue Net::SSH::AuthenticationFailed
-              raise Fog::Errors::Error.new("Error authenticating over ssh to host #{host} and user #{user}")
-            end
-
-            # Check for a clean exit code
-            if result.first.status == 0
-              ip_address=result.first.stdout.strip
-            else
-              # We got a failure executing the command
-              raise Fog::Errors::Error.new("The command #{ip_command} failed to execute with a clean exit code")
-            end
-
+            ip_address=ssh_ip_command(ip_command, service_arg.uri)
           else
             # It's not ssh enabled, so we assume it is
             if service_arg.uri.transport=="tls"
               raise Fog::Errors::Error.new("TlS remote transport is not currently supported, only ssh")
             end
-
-            # Execute the ip_command locally
-            # Initialize empty ip_address string
-            ip_address=""
-
-            IO.popen("#{ip_command}") do |p|
-              p.each_line do |l|
-                ip_address+=l
-              end
-              status=Process.waitpid2(p.pid)[1].exitstatus
-              if status!=0
-                raise Fog::Errors::Error.new("The command #{ip_command} failed to execute with a clean exit code")
-              end
-            end
-
-            #Strip any new lines from the string
-            ip_address=ip_address.chomp
+            ip_address=local_ip_command(ip_command)
           end
 
           # The Ip-address command has been run either local or remote now
