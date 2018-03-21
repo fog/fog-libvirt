@@ -45,6 +45,7 @@ module Fog
       request :destroy_interface
       request :get_node_info
       request :update_display
+      request :libversion
 
       module Shared
         include Fog::Compute::LibvirtUtil
