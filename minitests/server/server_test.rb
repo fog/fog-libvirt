@@ -49,19 +49,16 @@ class ServerTest < Minitest::Test
   end
 
   def test_local_ip_command_success
-    proc_info = lambda do |p|
-      assert_equal "test command", p
-    end
-    output = MiniTest::Mock.new
-    output.expect(:each_line, "127.0.0.1")
-    output.expect(:pid, 0)
+    proc_info = MiniTest::Mock.new
+    proc_info.expect(:each_line, "127.0.0.1")
+    proc_info.expect(:pid, 0)
     status = MiniTest::Mock.new
     status.expect(:exitstatus, 0)
     Process.stubs(:waitpid2).returns([0, status])
-    IO.stub(:popen, proc_info, output) do
+    IO.stub(:popen, true, proc_info) do
       @server.send(:local_ip_command, "test command")
     end
-    output.verify
+    proc_info.verify
     status.verify
   end
 end
