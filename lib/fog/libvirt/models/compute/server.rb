@@ -290,8 +290,7 @@ module Fog
           addresses(service_arg, options)
         end
 
-        def ssh_ip_command(command, uri = {})
-
+        def ssh_ip_command(ip_command, uri)
           # Retrieve the parts we need from the service to setup our ssh options
           user=uri.user #could be nil
           host=uri.host
@@ -321,7 +320,7 @@ module Fog
           end
         end
 
-        def local_ip_command(command)
+        def local_ip_command(ip_command)
           # Execute the ip_command locally
           # Initialize empty ip_address string
           ip_address=""
