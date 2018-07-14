@@ -26,6 +26,17 @@ Only ssh is supported as the transport for remote URI's. TLS is NOT supported, a
 - To check the connection you need to override your libvirt socket location in the URI
   - "qemu+ssh://patrick@myserver/system?socket=/var/run/libvirt/libvirt-sock"
 
+## Ceph RBD volumes
+To configure Ceph RBD volumes, the file ``/etc/foreman/ceph.conf`` is used.
+After adding the authentication key to a libvirt secret, it can be configured as follows:
+```
+monitor=mon001.example.com,mon002.example.com,mon003.example.com
+port=6789
+libvirt_ceph_pool=rbd_pool_name
+auth_username=libvirt
+auth_uuid=uuid_of_libvirt_secret
+```
+
 ## Configuration
 
 The URI can be configured in two ways:

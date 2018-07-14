@@ -32,13 +32,36 @@
 <% end -%>
   <clock offset='utc'/>
   <devices>
+<% args = {}
+    File.readlines('/etc/foreman/ceph.conf').each do |line|
+      pair = line.strip.split("=")
+      key = pair[0]
+      value = pair[1]
+      args[key] = value
+    end
+%>
 <% volumes.each do |vol| -%>
+  <% if vol.pool_name.include? args["libvirt_ceph_pool"]  %>
+    <disk type='network' device='disk'>
+      <driver name='qemu' type='<%= vol.format_type %>' cache='writeback' discard='unmap'/>
+      <source protocol='rbd' name='<%= vol.path %>'>
+        <% args["monitor"].split(",").each do |mon| %>
+        <host name='<%= mon %>' port='<%= args["port"] %>'/>
+        <% end %>
+      </source>
+      <auth username='<%= args["auth_username"] %>'>
+        <secret type='ceph' uuid='<%= args["auth_uuid"] %>'/>
+      </auth>
+      <target dev='sd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='scsi'/>
+    </disk>
+  <% else %>
     <disk type='file' device='disk'>
       <driver name='qemu' type='<%= vol.format_type %>'/>
       <source file='<%= vol.path %>'/>
       <%# we need to ensure a unique target dev -%>
       <target dev='vd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='virtio'/>
     </disk>
+  <% end %>
 <% end -%>
 <% if iso_file -%>
     <disk type='file' device='cdrom'>
