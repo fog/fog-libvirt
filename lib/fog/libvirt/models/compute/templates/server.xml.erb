@@ -60,6 +60,9 @@
       <model type='<%= nic.model %>'/>
     </interface>
 <% end -%>
+    <channel type='unix'>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+    </channel>
     <serial type='pty'>
       <target port='0'/>
     </serial>
