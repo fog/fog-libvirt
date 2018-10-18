@@ -16,6 +16,8 @@ module Fog
         attribute :path
         attribute :capacity
         attribute :allocation
+        attribute :owner
+        attribute :group
         attribute :format_type
         attribute :backing_volume
 
@@ -106,6 +108,8 @@ module Fog
             :name        => randomized_name,
             :capacity    => "10G",
             :allocation  => "1G",
+            :owner       => "0",
+            :group       => "0",
           }
         end
 
