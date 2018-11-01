@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def list_pool_volumes(uuid)
           pool = client.lookup_storage_pool_by_uuid uuid

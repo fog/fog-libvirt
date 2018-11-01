@@ -9,9 +9,7 @@ module Fog
   module Libvirt
     extend Fog::Provider
 
-    module Compute
-      autoload :Libvirt, File.expand_path('../libvirt/compute', __FILE__)
-    end
+    autoload :Compute, File.expand_path('../libvirt/compute', __FILE__)
 
     service(:compute, 'Compute')
   end

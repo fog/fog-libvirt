@@ -2,10 +2,10 @@ require 'fog/core/collection'
 require 'fog/libvirt/models/compute/server'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Servers < Fog::Collection
-        model Fog::Compute::Libvirt::Server
+        model Fog::Libvirt::Compute::Server
 
         def all(filter={})
           load(service.list_domains(filter))

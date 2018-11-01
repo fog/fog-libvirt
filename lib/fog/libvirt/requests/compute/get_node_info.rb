@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def get_node_info
           node_hash = Hash.new

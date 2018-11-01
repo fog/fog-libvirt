@@ -24,7 +24,7 @@ Shindo.tests('Fog::Compute[:libvirt] | volume model', ['libvirt']) do
         end
       end
     end
-    test('be a kind of Fog::Compute::Libvirt::Volume') { volume.kind_of? Fog::Compute::Libvirt::Volume }
+    test('be a kind of Fog::Libvirt::Compute::Volume') { volume.kind_of? Fog::Libvirt::Compute::Volume }
   end
 
   tests('Cloning volumes should') do

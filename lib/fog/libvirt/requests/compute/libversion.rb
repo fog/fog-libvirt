@@ -1,7 +1,7 @@
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def libversion()
           client.libversion

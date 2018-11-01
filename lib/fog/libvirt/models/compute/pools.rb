@@ -2,10 +2,10 @@ require 'fog/core/collection'
 require 'fog/libvirt/models/compute/pool'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Pools < Fog::Collection
-        model Fog::Compute::Libvirt::Pool
+        model Fog::Libvirt::Compute::Pool
 
         def all(filter = {})
           load(service.list_pools(filter))

@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def create_domain(xml)
           client.create_domain_xml(xml)

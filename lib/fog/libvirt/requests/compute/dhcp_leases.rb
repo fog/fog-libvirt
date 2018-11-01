@@ -1,8 +1,8 @@
 require 'socket'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def dhcp_leases(uuid, mac, flags = 0)
           client.lookup_network_by_uuid(uuid).dhcp_leases(mac, flags)

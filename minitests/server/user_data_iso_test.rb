@@ -34,10 +34,10 @@ class UserDataIsoTest < Minitest::Test
   def test_volume_is_created_during_user_data_iso_generation
     iso_path = "iso_file_path"
     @server.stubs(:system).returns(true)
-    Fog::Compute::Libvirt::Volumes.any_instance.expects(:create).
+    Fog::Libvirt::Compute::Volumes.any_instance.expects(:create).
         with(has_entries(:name => @server.cloud_init_volume_name)).
         returns(@compute.volumes.new)
-    Fog::Compute::Libvirt::Volume.any_instance.stubs(:upload_image)
+    Fog::Libvirt::Compute::Volume.any_instance.stubs(:upload_image)
 
     @server.create_user_data_iso
   end
@@ -45,8 +45,8 @@ class UserDataIsoTest < Minitest::Test
   def test_volume_is_uploaded_during_user_data_iso_generation
     iso_path = "iso_file_path"
     @server.stubs(:system).returns(true)
-    Fog::Compute::Libvirt::Volumes.any_instance.stubs(:create).returns(@compute.volumes.new)
-    Fog::Compute::Libvirt::Volume.any_instance.expects(:upload_image).returns(true)
+    Fog::Libvirt::Compute::Volumes.any_instance.stubs(:create).returns(@compute.volumes.new)
+    Fog::Libvirt::Compute::Volume.any_instance.expects(:upload_image).returns(true)
 
     @server.create_user_data_iso
   end
@@ -54,8 +54,8 @@ class UserDataIsoTest < Minitest::Test
   def test_iso_file_is_set_during_user_data_iso_generation
     iso_path = "iso_file_path"
     @server.stubs(:system).returns(true)
-    Fog::Compute::Libvirt::Volumes.any_instance.stubs(:create).returns(@compute.volumes.new)
-    Fog::Compute::Libvirt::Volume.any_instance.stubs(:upload_image)
+    Fog::Libvirt::Compute::Volumes.any_instance.stubs(:create).returns(@compute.volumes.new)
+    Fog::Libvirt::Compute::Volume.any_instance.stubs(:upload_image)
 
     @server.create_user_data_iso
     assert_equal @server.cloud_init_volume_name, @server.iso_file
@@ -65,8 +65,8 @@ class UserDataIsoTest < Minitest::Test
     @server.stubs(:system).returns(true)
     volume = @compute.volumes.new
     volume.stubs(:path).returns("/srv/libvirt/#{@server.cloud_init_volume_name}")
-    Fog::Compute::Libvirt::Volumes.any_instance.stubs(:create).returns(volume)
-    Fog::Compute::Libvirt::Volume.any_instance.stubs(:upload_image)
+    Fog::Libvirt::Compute::Volumes.any_instance.stubs(:create).returns(volume)
+    Fog::Libvirt::Compute::Volume.any_instance.stubs(:upload_image)
 
     @server.create_user_data_iso
     assert_equal '/srv/libvirt', @server.iso_dir

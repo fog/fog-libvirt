@@ -21,7 +21,7 @@ Shindo.tests('Fog::Compute[:libvirt] | interface model', ['libvirt']) do
         end
       end
     end
-    test('be a kind of Fog::Compute::Libvirt::Pool') { pool.kind_of? Fog::Compute::Libvirt::Pool }
+    test('be a kind of Fog::Libvirt::Compute::Pool') { pool.kind_of? Fog::Libvirt::Compute::Pool }
   end
 
 end

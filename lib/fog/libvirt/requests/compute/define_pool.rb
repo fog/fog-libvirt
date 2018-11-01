@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def define_pool(xml)
           client.define_storage_pool_xml(xml)

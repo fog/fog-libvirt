@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def destroy_network(uuid)
           client.lookup_network_by_uuid(uuid).destroy

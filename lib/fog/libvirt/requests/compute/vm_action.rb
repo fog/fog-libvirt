@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def vm_action(uuid, action)
           domain = client.lookup_domain_by_uuid(uuid)

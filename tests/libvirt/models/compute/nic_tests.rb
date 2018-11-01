@@ -25,7 +25,7 @@ Shindo.tests('Fog::Compute[:libvirt] | nic model', ['libvirt']) do
         end
       end
     end
-    test('be a kind of Fog::Compute::Libvirt::Nic') { nic.kind_of? Fog::Compute::Libvirt::Nic }
+    test('be a kind of Fog::Libvirt::Compute::Nic') { nic.kind_of? Fog::Libvirt::Compute::Nic }
   end
 
 end

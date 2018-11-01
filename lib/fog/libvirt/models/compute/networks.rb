@@ -2,10 +2,10 @@ require 'fog/core/collection'
 require 'fog/libvirt/models/compute/network'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Networks < Fog::Collection
-        model Fog::Compute::Libvirt::Network
+        model Fog::Libvirt::Compute::Network
 
         def all(filter={})
           load(service.list_networks(filter))

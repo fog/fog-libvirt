@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def volume_action(key, action, options={})
           get_volume({:key => key}, true).send(action)

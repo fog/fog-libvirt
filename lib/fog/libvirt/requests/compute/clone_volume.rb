@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def clone_volume (pool_name, xml, name)
           vol = client.lookup_storage_pool_by_name(pool_name).lookup_volume_by_name(name)
@@ -10,7 +10,7 @@ module Fog
 
       class Mock
         def clone_volume(pool_name, xml, name)
-          Fog::Compute::Libvirt::Volume.new({:pool_name => pool_name, :xml => xml})
+          Fog::Libvirt::Compute::Volume.new({:pool_name => pool_name, :xml => xml})
         end
       end
     end

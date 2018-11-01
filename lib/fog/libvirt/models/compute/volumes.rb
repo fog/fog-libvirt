@@ -2,10 +2,10 @@ require 'fog/core/collection'
 require 'fog/libvirt/models/compute/volume'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Volumes < Fog::Collection
-        model Fog::Compute::Libvirt::Volume
+        model Fog::Libvirt::Compute::Volume
 
         def all(filter = {})
           load(service.list_volumes(filter))
