@@ -25,7 +25,7 @@ Shindo.tests('Fog::Compute[:libvirt] | network model', ['libvirt']) do
         end
       end
     end
-    test('be a kind of Fog::Compute::Libvirt::Network') { network.kind_of? Fog::Compute::Libvirt::Network }
+    test('be a kind of Fog::Libvirt::Compute::Network') { network.kind_of? Fog::Libvirt::Compute::Network }
   end
 
 end

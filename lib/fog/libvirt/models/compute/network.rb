@@ -2,10 +2,10 @@ require 'fog/core/model'
 require 'fog/libvirt/models/compute/util/util'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Network < Fog::Model
-        include Fog::Compute::LibvirtUtil
+        include Fog::Libvirt::Util
 
         identity :uuid
         attribute :name

@@ -41,7 +41,7 @@ class ServerTest < Minitest::Test
     result.expect(:status, 0)
     result.expect(:stdout, "any_ip")
     fog_ssh.expect(:run, [result], [String])
-    uri = ::Fog::Compute::LibvirtUtil::URI.new('qemu+ssh://localhost:22?keyfile=nofile')
+    uri = ::Fog::Libvirt::Util::URI.new('qemu+ssh://localhost:22?keyfile=nofile')
     Fog::SSH.stub(:new, fog_ssh) do
       @server.send(:ssh_ip_command, "test command", uri)
     end

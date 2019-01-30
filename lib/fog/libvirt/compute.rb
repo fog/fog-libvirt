@@ -2,8 +2,8 @@ require 'fog/libvirt/models/compute/util/util'
 require 'fog/libvirt/models/compute/util/uri'
 
 module Fog
-  module Compute
-    class Libvirt < Fog::Service
+  module Libvirt
+    class Compute < Fog::Service
       requires   :libvirt_uri
       recognizes :libvirt_username, :libvirt_password
       recognizes :libvirt_ip_command
@@ -48,7 +48,7 @@ module Fog
       request :libversion
 
       module Shared
-        include Fog::Compute::LibvirtUtil
+        include Fog::Libvirt::Util
       end
 
       class Mock
@@ -78,7 +78,7 @@ module Fog
         attr_reader :ip_command
 
         def initialize(options={})
-          @uri = ::Fog::Compute::LibvirtUtil::URI.new(enhance_uri(options[:libvirt_uri]))
+          @uri = ::Fog::Libvirt::Util::URI.new(enhance_uri(options[:libvirt_uri]))
           @ip_command = options[:libvirt_ip_command]
 
           # libvirt is part of the gem => ruby-libvirt

@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def upload_volume(pool_name, volume_name, file_path)
           volume = client.lookup_storage_pool_by_name(pool_name).lookup_volume_by_name(volume_name)

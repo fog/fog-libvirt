@@ -1,8 +1,8 @@
 require 'fog/core/model'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Interface < Fog::Model
         identity :name
         attribute :mac

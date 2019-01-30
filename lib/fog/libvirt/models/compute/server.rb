@@ -3,10 +3,10 @@ require 'fog/libvirt/models/compute/util/util'
 require 'fileutils'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Server < Fog::Compute::Server
-        include Fog::Compute::LibvirtUtil
+        include Fog::Libvirt::Util
         attr_reader :xml
 
         identity :id, :aliases => 'uuid'

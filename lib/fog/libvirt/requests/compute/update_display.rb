@@ -1,6 +1,6 @@
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Real
         def update_display(options = { })
           raise ArgumentError, "uuid is a required parameter" unless options.key? :uuid

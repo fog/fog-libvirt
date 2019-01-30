@@ -1,8 +1,8 @@
 require 'fog/core/model'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Node < Fog::Model
         identity :uuid
 

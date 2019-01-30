@@ -1,8 +1,8 @@
 require 'fog/core/model'
 
 module Fog
-  module Compute
-    class Libvirt
+  module Libvirt
+    class Compute
       class Pool < Fog::Model
         attr_reader :xml
 

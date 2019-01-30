@@ -3,7 +3,7 @@ module Libvirt # deviates from other bin stuff to accommodate gem
     def class_for(key)
       case key
       when :compute
-        Fog::Compute::Libvirt
+        Fog::Libvirt::Compute
       else
         raise ArgumentError, "Unrecognized service: #{key}"
       end
