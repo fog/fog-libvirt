@@ -29,6 +29,7 @@ module Fog
         attribute :display
         attribute :cpu
         attribute :hugepages
+        attribute :guest_agent
 
         attribute :state
 
@@ -480,6 +481,7 @@ module Fog
             :display                => default_display,
             :cpu                    => {},
             :hugepages              => false,
+            :guest_agent            => true,
           }
         end
 
