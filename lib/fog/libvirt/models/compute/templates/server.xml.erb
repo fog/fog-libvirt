@@ -33,12 +33,14 @@
   <clock offset='utc'/>
   <devices>
 <% args = {}
-    File.readlines('/etc/foreman/ceph.conf').each do |line|
-      pair = line.strip.split("=")
-      key = pair[0]
-      value = pair[1]
-      args[key] = value
-    end
+   if File.file?('/etc/foreman/ceph.conf')
+     File.readlines('/etc/foreman/ceph.conf').each do |line|
+       pair = line.strip.split("=")
+       key = pair[0]
+       value = pair[1]
+       args[key] = value
+     end
+   end
 %>
 <% volumes.each do |vol| -%>
   <% if vol.pool_name.include? args["libvirt_ceph_pool"]  %>
