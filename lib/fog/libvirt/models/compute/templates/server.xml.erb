@@ -43,7 +43,7 @@
    end
 %>
 <% volumes.each do |vol| -%>
-  <% if vol.pool_name.include? args["libvirt_ceph_pool"]  %>
+  <% if File.file?('/etc/foreman/ceph.conf') && vol.pool_name.include?(args["libvirt_ceph_pool"]) %>
     <disk type='network' device='disk'>
       <driver name='qemu' type='<%= vol.format_type %>' cache='writeback' discard='unmap'/>
       <source protocol='rbd' name='<%= vol.path %>'>
