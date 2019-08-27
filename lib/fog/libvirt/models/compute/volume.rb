@@ -114,14 +114,12 @@ module Fog
         end
 
         def split_size_unit(text)
-          if text.kind_of? Integer
-            # if text is an integer, match will fail
-            size    = text
-            unit    = 'G'
-          else
-            matcher = text.match(/(\d+)(.+)/)
+          if (text.kind_of? String) && (matcher = text.match(/(\d+)(.+)/))
             size    = matcher[1]
             unit    = matcher[2]
+          else
+            size    = text.to_i
+            unit    = "G"
           end
           [size, unit]
         end
