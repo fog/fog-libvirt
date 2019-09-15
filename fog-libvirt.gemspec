@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency("fog-core", ">= 1.27.4")
   s.add_dependency("fog-json")
-  s.add_dependency("fog-xml", "~> 0.1.1")
+  s.add_dependency("fog-xml", "~> 0.1")
   s.add_dependency('ruby-libvirt','>= 0.7.0')
   s.add_dependency("json")
 
