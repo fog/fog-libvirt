@@ -52,7 +52,11 @@
         <% end %>
       </source>
       <auth username='<%= args["auth_username"] %>'>
+       <% if args.key?("auth_uuid") -%>
         <secret type='ceph' uuid='<%= args["auth_uuid"] %>'/>
+       <% else -%>
+        <secret type='ceph' usage='<%= args["auth_usage"] %>'/>
+       <% end -%>
       </auth>
       <target dev='sd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='scsi'/>
     </disk>
