@@ -35,9 +35,12 @@ port=6789
 libvirt_ceph_pool=rbd_pool_name
 auth_username=libvirt
 auth_uuid=uuid_of_libvirt_secret
+bus_type=virtio
 ```
 For more recent versions of libvirt which support using the secret by name (`usage` attribute in the `secret` tag),
 you can also drop `auth_uuid` and specify `auth_usage` instead. If both are specified, `auth_uuid` will be preferred for maximum compatibility.
+
+The `bus_type` can be set to `virtio` or `scsi`. If it is ommited, the default is `scsi`.
 
 ## Configuration
 

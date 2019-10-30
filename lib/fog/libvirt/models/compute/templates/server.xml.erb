@@ -63,7 +63,11 @@
         <secret type='ceph' usage='<%= args["auth_usage"] %>'/>
        <% end -%>
       </auth>
-      <target dev='sd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='scsi'/>
+      <% if args['bus_type'] == 'virtio' %>
+        <target dev='vd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='virtio'/>
+      <% else %>
+        <target dev='sd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='scsi'/>
+      <% end %>
     </disk>
   <% else %>
     <disk type='file' device='disk'>
