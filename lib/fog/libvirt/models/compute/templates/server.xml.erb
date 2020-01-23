@@ -94,6 +94,11 @@
       <target type='virtio' name='org.qemu.guest_agent.0'/>
     </channel>
 <% end -%>
+<% if virtio_rng -%>
+    <rng model='virtio'>
+      <backend model='random'/>
+    </rng>
+<% end -%>
     <serial type='pty'>
       <target port='0'/>
     </serial>
