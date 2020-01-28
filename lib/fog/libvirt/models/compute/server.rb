@@ -483,7 +483,7 @@ module Fog
             :cpu                    => {},
             :hugepages              => false,
             :guest_agent            => true,
-            :virtio_rng             => true,
+            :virtio_rng             => {},
           }
         end
 

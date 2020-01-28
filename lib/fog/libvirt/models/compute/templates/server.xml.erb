@@ -94,11 +94,16 @@
       <target type='virtio' name='org.qemu.guest_agent.0'/>
     </channel>
 <% end -%>
-<% if virtio_rng -%>
     <rng model='virtio'>
-      <backend model='random'/>
-    </rng>
+<%
+  rng_backend_model = virtio_rng[:backend_model] ? virtio_rng[:backend_model] : 'random'
+-%>
+<% if virtio_rng[:backend_path] -%>
+      <backend model='<%= rng_backend_model %>'><%= virtio_rng[:backend_path] %></backend>
+<% else -%>
+      <backend model='<%= rng_backend_model %>'/>
 <% end -%>
+    </rng>
     <serial type='pty'>
       <target port='0'/>
     </serial>
