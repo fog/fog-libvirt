@@ -30,6 +30,7 @@ module Fog
         attribute :cpu
         attribute :hugepages
         attribute :guest_agent
+        attribute :virtio_rng
 
         attribute :state
 
@@ -482,6 +483,7 @@ module Fog
             :cpu                    => {},
             :hugepages              => false,
             :guest_agent            => true,
+            :virtio_rng             => {},
           }
         end
 
