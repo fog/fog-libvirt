@@ -1,6 +1,7 @@
 require 'fog/compute/models/server'
 require 'fog/libvirt/models/compute/util/util'
 require 'fileutils'
+require 'tempfile'
 
 module Fog
   module Libvirt
@@ -239,8 +240,18 @@ module Fog
           File.open(File.join(dir_path, 'user-data'), 'w') { |f| f.write user_data }
 
           isofile = Tempfile.new(['init', '.iso']).path
-          unless system("genisoimage -output #{isofile} -volid cidata -joliet -rock #{File.join(dir_path, 'user-data')} #{File.join(dir_path, 'meta-data')}")
-            raise Fog::Errors::Error.new("Couldn't generate cloud-init iso disk with genisoimage.")
+
+          geniso_util = case
+          when command_exists?('genisoimage')
+            'genisoimage'
+          when command_exists?('mkisofs')
+            'mkisofs'
+          else
+            raise Fog::Errors::Error.new("genisoimage/mkisofs is required for generate cloud-init iso disk.")
+          end
+
+          unless system("#{geniso_util} -output #{isofile} -volid cidata -joliet -rock #{File.join(dir_path, 'user-data')} #{File.join(dir_path, 'meta-data')}")
+            raise Fog::Errors::Error.new("Couldn't generate cloud-init iso disk with #{geniso_util}.")
           end
           blk.call(isofile)
         end
@@ -498,6 +509,11 @@ module Fog
 
         def default_display
           {:port => '-1', :listen => '127.0.0.1', :type => 'vnc', :password => '' }
+        end
+
+        def command_exists?(name)
+          `which #{name}`
+          $?.success?
         end
       end
     end
