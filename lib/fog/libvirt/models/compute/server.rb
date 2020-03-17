@@ -32,7 +32,7 @@ module Fog
         attribute :hugepages
         attribute :guest_agent
         attribute :virtio_rng
-
+        attribute :geniso_util
         attribute :state
 
         # The following attributes are only needed when creating a new vm
@@ -241,12 +241,7 @@ module Fog
 
           isofile = Tempfile.new(['init', '.iso']).path
 
-          geniso_util = case
-          when command_exists?('genisoimage')
-            'genisoimage'
-          when command_exists?('mkisofs')
-            'mkisofs'
-          else
+          unless %w{genisoimage mkisofs}.include?(geniso_util)
             raise Fog::Errors::Error.new("genisoimage/mkisofs is required for generate cloud-init iso disk.")
           end
 
@@ -495,6 +490,7 @@ module Fog
             :hugepages              => false,
             :guest_agent            => true,
             :virtio_rng             => {},
+            :geniso_util            => 'genisoimage'
           }
         end
 
@@ -509,11 +505,6 @@ module Fog
 
         def default_display
           {:port => '-1', :listen => '127.0.0.1', :type => 'vnc', :password => '' }
-        end
-
-        def command_exists?(name)
-          `which #{name}`
-          $?.success?
         end
       end
     end
