@@ -24,10 +24,28 @@ class UserDataIsoTest < Minitest::Test
     end
   end
 
-  def test_iso_is_generated
+  def test_iso_is_generated_via_mkisofs
+    @server = @compute.servers.new(:name => "test", :geniso_util => 'mkisofs')
+    in_a_temp_dir do |d|
+      @server.expects(:system).with(regexp_matches(/^mkisofs/)).returns(true)
+      @server.generate_config_iso_in_dir(d, @test_data) {|iso| }
+    end
+  end
+
+  def test_iso_is_generated_via_genisoimage
     in_a_temp_dir do |d|
       @server.expects(:system).with(regexp_matches(/^genisoimage/)).returns(true)
       @server.generate_config_iso_in_dir(d, @test_data) {|iso| }
+    end
+  end
+
+  def test_iso_is_not_generated_via_unrecognised_geniso_util
+    @server = @compute.servers.new(:name => "test", :geniso_util => 'mkisofs-v2')
+    in_a_temp_dir do |d|
+      err = assert_raises Fog::Errors::Error do
+        @server.generate_config_iso_in_dir(d, @test_data) {|iso| }
+      end
+      assert_equal err.message, "genisoimage/mkisofs is required for generate cloud-init iso disk."
     end
   end
 
