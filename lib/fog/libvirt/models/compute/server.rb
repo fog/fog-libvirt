@@ -78,6 +78,10 @@ module Fog
           action_status
         end
 
+        def update_autostart(value)
+          service.update_autostart(uuid, value)
+        end
+
         def mac
           nics.first.mac if nics && nics.first
         end
@@ -132,9 +136,10 @@ module Fog
         end
 
         #alias methods
-        alias_method :halt,    :poweroff
-        alias_method :stop,    :shutdown
-        alias_method :active?, :active
+        alias_method :halt,       :poweroff
+        alias_method :stop,       :shutdown
+        alias_method :active?,    :active
+        alias_method :autostart?, :autostart
 
         def volumes
           # lazy loading of volumes
@@ -474,6 +479,7 @@ module Fog
             :os_type                => "hvm",
             :arch                   => "x86_64",
             :domain_type            => "kvm",
+            :autostart              => false,
             :iso_dir                => default_iso_dir,
             :network_interface_type => "network",
             :network_nat_network    => "default",

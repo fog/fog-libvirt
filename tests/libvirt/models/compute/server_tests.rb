@@ -5,6 +5,8 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
 
   tests('The server model should') do
     tests('have the action') do
+      test('autostart') { server.respond_to? 'autostart' }
+      test('update_autostart') { server.respond_to? 'update_autostart' }
       test('reload') { server.respond_to? 'reload' }
       %w{ start stop destroy reboot suspend }.each do |action|
         test(action) { server.respond_to? action }
