@@ -17,7 +17,7 @@ module Fog
               end
             end
           else
-            return [get_volume(filter)]
+            data << get_volume(filter)
           end
           data.compact
         end
@@ -69,7 +69,8 @@ module Fog
               return raw ? vol : volume_to_attributes(vol)
             end
           end
-          { }
+
+          nil
         end
       end
 
