@@ -60,6 +60,7 @@ module Fog
           new_volume.save
 
           new_volume.reload
+          new_volume
         end
 
         def clone_volume(new_name)
@@ -71,6 +72,7 @@ module Fog
           new_volume.path = service.clone_volume(pool_name, new_volume.to_xml, self.name).path
 
           new_volume.reload
+          new_volume
         end
 
         def upload_image(file_path)

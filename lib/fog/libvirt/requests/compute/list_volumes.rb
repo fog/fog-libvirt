@@ -78,15 +78,22 @@ module Fog
         def list_volumes(filters={ })
           vol1 = mock_volume 'vol1'
           vol2 = mock_volume 'vol2'
-          [vol1, vol2]
+          vols = [vol1, vol2]
+
+          if filters.keys.empty?
+            return vols
+          end
+
+          key = filters.keys.first
+          vols.select { |v| v[key] == filters[key] }
         end
 
         def mock_volume name
           {
               :pool_name   => 'vol.pool.name',
               :key         => 'vol.key',
-              :id          => 'vol.key',
-              :path        => 'vol.path',
+              :id          => "vol.#{name}",
+              :path        => "path/to/disk", # used by in mock_files/domain.xml
               :name        => name,
               :format_type => 'raw',
               :allocation  => 123,

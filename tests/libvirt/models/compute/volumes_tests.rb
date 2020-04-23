@@ -7,8 +7,9 @@ Shindo.tests('Fog::Compute[:libvirt] | volumes collection', ['libvirt']) do
     test('should be a kind of Fog::Libvirt::Compute::Volumes') { volumes.kind_of? Fog::Libvirt::Compute::Volumes }
     tests('should be able to reload itself').succeeds { volumes.reload }
     tests('should be able to get a model') do
-      tests('by instance uuid').succeeds { volumes.get volumes.first.id }
+      tests('by instance uuid').succeeds { volumes.get volumes.first.key }
     end
+    test('filtered should be empty') { volumes.all(:name => "does-not-exist").empty? }
   end
 
 end
