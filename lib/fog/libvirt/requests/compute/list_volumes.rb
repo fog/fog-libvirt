@@ -91,7 +91,7 @@ module Fog
         def mock_volume name
           {
               :pool_name   => 'vol.pool.name',
-              :key         => 'vol.key',
+              :key         => "vol.#{name}", # needs to match id
               :id          => "vol.#{name}",
               :path        => "path/to/disk", # used by in mock_files/domain.xml
               :name        => name,
