@@ -65,6 +65,8 @@
       </auth>
       <% if args['bus_type'] == 'virtio' %>
         <target dev='vd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='virtio'/>
+      <% elsif domain_type == 'xen' %>
+        <target dev='xvd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='xen'/>
       <% else %>
         <target dev='sd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='scsi'/>
       <% end %>
@@ -73,8 +75,12 @@
     <disk type='file' device='disk'>
       <driver name='qemu' type='<%= vol.format_type %>'/>
       <source file='<%= vol.path %>'/>
+      <% if args['bus_type'] == 'virtio' %>
       <%# we need to ensure a unique target dev -%>
       <target dev='vd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='virtio'/>
+      <% elsif domain_type == 'xen' %>
+        <target dev='xvd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='xen'/>
+      <% end %>
     </disk>
   <% end %>
 <% end -%>
@@ -89,25 +95,27 @@
 <% end -%>
 <% nics.each do |nic| -%>
     <interface type='<%= nic.type %>'>
-      <source <%= nic.type == 'bridge' ? "bridge='#{nic.bridge}'" : "network='#{nic.network}'" %> />
+      <source <%= nic.type == 'bridge' ? "network='#{nic.bridge}'" : "network='#{nic.network}'" %> />
       <model type='<%= nic.model %>'/>
     </interface>
 <% end -%>
-<% if guest_agent -%>
+<% if domain_type == 'kvm' -%>
+  <% if guest_agent -%>
     <channel type='unix'>
       <target type='virtio' name='org.qemu.guest_agent.0'/>
     </channel>
-<% end -%>
+  <% end -%>
     <rng model='virtio'>
 <%
   rng_backend_model = virtio_rng[:backend_model] ? virtio_rng[:backend_model] : 'random'
 -%>
-<% if virtio_rng[:backend_path] -%>
+  <% if virtio_rng[:backend_path] -%>
       <backend model='<%= rng_backend_model %>'><%= virtio_rng[:backend_path] %></backend>
-<% else -%>
+  <% else -%>
       <backend model='<%= rng_backend_model %>'/>
-<% end -%>
+  <% end -%>
     </rng>
+<% end -%>
     <serial type='pty'>
       <target port='0'/>
     </serial>
