@@ -9,6 +9,7 @@ Shindo.tests('Fog::Compute[:libvirt] | volumes collection', ['libvirt']) do
     tests('should be able to get a model') do
       tests('by instance uuid').succeeds { volumes.get volumes.first.id }
     end
+    test('filtered should be empty') { volumes.all(:name => "does-not-exist").empty? }
   end
 
 end
