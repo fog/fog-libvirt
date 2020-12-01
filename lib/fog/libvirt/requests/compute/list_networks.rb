@@ -25,12 +25,14 @@ module Fog
           end
         end
 
+        # bridge name may not be defined in some networks, we should skip that in such case
         def network_to_attributes(net)
           return if net.nil?
+          bridge_name = net.bridge_name rescue ''
           {
             :uuid        => net.uuid,
             :name        => net.name,
-            :bridge_name => net.bridge_name
+            :bridge_name => bridge_name
           }
         end
       end
