@@ -52,9 +52,11 @@
     <disk type='network' device='disk'>
       <driver name='qemu' type='<%= vol.format_type %>' cache='writeback' discard='unmap'/>
       <source protocol='rbd' name='<%= vol.path %>'>
+      <% if args.key?("monitor") -%>
         <% args["monitor"].split(",").each do |mon| %>
         <host name='<%= mon %>' port='<%= args["port"] %>'/>
         <% end %>
+      <% end %>
       </source>
       <auth username='<%= args["auth_username"] %>'>
        <% if args.key?("auth_uuid") -%>
