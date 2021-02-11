@@ -347,6 +347,9 @@ module Fog
           ip_address.chomp
         end
 
+        # Locale-friendly removal of non-alpha nums
+        DOMAIN_CLEANUP_REGEXP = Regexp.compile('[\W_-]')
+
         # This retrieves the ip address of the mac address using ip_command
         # It returns an array of public and private ip addresses
         # Currently only one ip address is returned, but in the future this could be multiple
@@ -360,7 +363,7 @@ module Fog
           ip_command_global=service_arg.ip_command.nil? ? 'grep $mac /var/log/arpwatch.log|sed -e "s/new station//"|sed -e "s/changed ethernet address//g" |sed -e "s/reused old ethernet //" |tail -1 |cut -d ":" -f 4-| cut -d " " -f 3' : service_arg.ip_command
           ip_command_local=options[:ip_command].nil? ? ip_command_global : options[:ip_command]
 
-          ip_command="mac=#{mac}; server_name=#{name}; "+ip_command_local
+          ip_command="mac=#{mac}; server_name=#{name.gsub(DOMAIN_CLEANUP_REGEXP, '_')}; "+ip_command_local
 
           ip_address=nil
 
