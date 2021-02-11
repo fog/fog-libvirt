@@ -12,21 +12,13 @@ script: bundle exec rake
 matrix:
   fast_finish: true
   include:
-    - rvm: 2.0.0
+    - rvm: 2.4.0
       gemfile: Gemfile
-    - rvm: 2.1.0
-      gemfile: Gemfile
-    - rvm: 2.1.1
-      gemfile: Gemfile
-    - rvm: 2.2.0
-      gemfile: Gemfile
-    - rvm: 2.3.1
-      gemfile: Gemfile
-    - rvm: 2.4.5
-      gemfile: Gemfile
-    - rvm: 2.5.3
+    - rvm: 2.5.0
       gemfile: Gemfile
     - rvm: 2.6.0
+      gemfile: Gemfile
+    - rvm: 2.7.0
       gemfile: Gemfile
 
 notifications:
