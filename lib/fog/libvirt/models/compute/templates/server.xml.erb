@@ -110,6 +110,13 @@
       <backend model='<%= rng_backend_model %>'/>
 <% end -%>
     </rng>
+<% if arch == "s390x" -%>
+    <controller type="scsi" index="0" model="virtio-scsi"/>
+    <console type="pty">
+      <target type="sclp"/>
+    </console>
+    <memballoon model="virtio"/>
+<% else -%>
     <serial type='pty'>
       <target port='0'/>
     </serial>
@@ -118,6 +125,7 @@
     </console>
     <input type='tablet' bus='usb'/>
     <input type='mouse' bus='ps2'/>
+<% end -%>
 <%
 display_type = display[:type]
 
@@ -137,9 +145,11 @@ unless display[:password].empty?
   display_password = "passwd='#{display[:password]}'"
 end
 -%>
+<% if arch != "s390x" -%>
     <graphics type='<%= display_type %>' port='<%= display_port %>' autoport='<%= autoport %>' <%= display_listen %> <%= display_password %> />
     <video>
       <model type='cirrus' vram='9216' heads='1'/>
     </video>
+<% end -%>
   </devices>
 </domain>
