@@ -120,15 +120,17 @@ module Fog
           # on macosx, chances are we are using libvirt through homebrew
           # the client will default to a socket location based on it's own location (/opt)
           # we conveniently point it to /var/run/libvirt/libvirt-sock
-          # if no socket option has been specified explicitly
+          # if no socket option has been specified explicitly and
+          # if the socket exists
 
-          if RUBY_PLATFORM =~ /darwin/
+          socketpath="/var/run/libvirt/libvirt-sock"
+          if RUBY_PLATFORM =~ /darwin/ and Pathname.new("socketpath").exist?
             querystring=::URI.parse(uri).query
             if querystring.nil?
-              append="?socket=/var/run/libvirt/libvirt-sock"
+              append="?socket=#{socketpath}"
             else
               if !::CGI.parse(querystring).key?("socket")
-                append="&socket=/var/run/libvirt/libvirt-sock"
+                append="&socket=#{socketpath}"
               end
             end
           end
