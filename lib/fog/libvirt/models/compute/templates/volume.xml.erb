@@ -5,8 +5,12 @@
         <target>
           <format type="<%= format_type %>"/>
           <permissions>
+            <% if owner -%>
             <owner><%= owner %></owner>
+            <% end -%>
+            <% if group -%>
             <group><%= group %></group>
+            <% end -%>
             <mode>0744</mode>
             <label>virt_image_t</label>
           </permissions>

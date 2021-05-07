@@ -108,8 +108,8 @@ module Fog
             :name        => randomized_name,
             :capacity    => "10G",
             :allocation  => "1G",
-            :owner       => "0",
-            :group       => "0",
+            :owner       => nil,
+            :group       => nil,
           }
         end
 
