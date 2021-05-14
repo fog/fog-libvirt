@@ -124,7 +124,7 @@ module Fog
           # if the socket exists
 
           socketpath="/var/run/libvirt/libvirt-sock"
-          if RUBY_PLATFORM =~ /darwin/ and File.exist?("socketpath")
+          if RUBY_PLATFORM =~ /darwin/ && File.exist?("socketpath")
             querystring=::URI.parse(uri).query
             if querystring.nil?
               append="?socket=#{socketpath}"
