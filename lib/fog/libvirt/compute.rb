@@ -128,10 +128,8 @@ module Fog
             querystring=::URI.parse(uri).query
             if querystring.nil?
               append="?socket=#{socketpath}"
-            else
-              if !::CGI.parse(querystring).key?("socket")
-                append="&socket=#{socketpath}"
-              end
+            elsif !::CGI.parse(querystring).key?("socket")
+              append="&socket=#{socketpath}"
             end
           end
           uri+append
