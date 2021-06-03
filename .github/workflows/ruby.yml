@@ -23,6 +23,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Update apt-get
+      run: sudo apt-get update -qq
     - name: Install libvirt-dev
       run: sudo apt-get install -y libvirt-dev
     - name: Set up Ruby
