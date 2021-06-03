@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         ruby-version: ['2.5', '2.6', '2.7', '3.0', 'head']
-    continue-on-error: ${{ matrix.ruby == '3.0' || matrix.ruby == 'head' }}
+    continue-on-error: ${{ matrix.ruby-version == '3.0' || matrix.ruby-version == 'head' }}
 
     steps:
     - uses: actions/checkout@v2
