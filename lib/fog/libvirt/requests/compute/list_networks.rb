@@ -31,7 +31,7 @@ module Fog
 
           begin
             bridge_name = net.bridge_name
-          rescue Libvirt::Error
+          rescue ::Libvirt::Error
             bridge_name = ''
           end
 
