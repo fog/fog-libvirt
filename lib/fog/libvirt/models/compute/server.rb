@@ -267,8 +267,165 @@ module Fog
           "#{name}-cloud-init.iso"
         end
 
+        # rubocop:disable Metrics
+        def to_xml
+          builder = Nokogiri::XML::Builder.new do |xml|
+            xml.domain(:type => domain_type) do
+              xml.name(name)
+              xml.memory(memory_size)
+
+              if hugepages
+                xml.memoryBacking do
+                  xml.hugepages
+                end
+              end
+
+              xml.vcpu(cpus)
+              xml.os do
+                xml.type(os_type, :arch => arch)
+
+                boot_order.each do |dev|
+                  xml.boot(:dev => dev)
+                end
+              end
+              xml.features do
+                xml.acpi
+                xml.apic
+                xml.pae
+              end
+
+              unless cpu.empty?
+                if cpu[:mode]
+                  xml.cpu(:mode => cpu[:mode])
+                else
+                  xml.cpu do
+                    xml.model(cpu.dig(:model, :name), :fallback => cpu.dig(:model, :fallback) || "allow")
+                  end
+                end
+              end
+
+              xml.clock(:offset => "utc")
+
+              xml.devices do
+                ceph_args = read_ceph_args
+
+                volumes.each_with_index do |volume, index|
+                  target_device = "vd#{('a'..'z').to_a[index]}"
+                  if ceph_args && volume.pool_name.include?(ceph_args["libvirt_ceph_pool"])
+                    xml.disk(:type => "network", :device => "disk") do
+                      xml.driver(:name => "qemu", :type => volume.format_type, :cache => "writeback", :discard => "unmap")
+                      xml.source(:protocol => "rbd", :name => volume.path)
+
+                      ceph_args["monitor"]&.split(",")&.each do |monitor|
+                        xml.host(:name => monitor, :port => ceph_args["port"])
+                      end
+
+                      xml.auth(:username => ceph_args["auth_username"]) do
+                        if ceph_args.key?("auth_uuid")
+                          xml.secret(:type => "ceph", :uuid => ceph_args["auth_uuid"])
+                        else
+                          xml.secret(:type => "ceph", :usage => ceph_args["auth_usage"])
+                        end
+                      end
+
+                      xml.target(:dev => target_device, :bus => args["bus_type"] == "virtio" ? "virtio" : "scsi")
+                    end
+                  else
+                    xml.disk(:type => "file", :device => "disk") do
+                      xml.driver(:name => "qemu", :type => volume.format_type)
+                      xml.source(:file => volume.path)
+                      xml.target(:dev => target_device, :bus => "virtio")
+                    end
+                  end
+                end
+
+                if iso_file
+                  xml.disk(:type => "file", :device => "cdrom") do
+                    xml.driver(:name => "qemu", :type => "raw")
+                    xml.source(:file => "#{iso_dir}/#{iso_file}")
+                    xml.target(:dev => "hdc", :bus => "ide")
+                    xml.readonly
+                    xml.address(:type => "drive", :controller => 0, :bus => 1, :unit => 0)
+                  end
+                end
+
+                nics.each do |nic|
+                  xml.interface(:type => nic.type) do
+                    if nic.type == "bridge"
+                      xml.source(:bridge => nic.bridge)
+                    else
+                      xml.source(:network => nic.network)
+                    end
+                    xml.model(:type => nic.model)
+                  end
+                end
+
+                if guest_agent
+                  xml.channel(:type => "unix") do
+                    xml.target(:type => "virtio", :name => "org.qemu.guest_agent.0")
+                  end
+                end
+
+                xml.rng(:model => "virtio") do
+                  xml.backend(virtio_rng[:backend_path], :model => virtio_rng.fetch(:backend_model, "random"))
+                end
+
+                if arch == "s390x"
+                  xml.controller(:type => "scsi", :index => "0", :model => "virtio-scsi")
+                  xml.console(:type => "pty") do
+                    xml.target(:type => "sclp")
+                  end
+                  xml.memballoon(:model => "virtio")
+                else
+                  xml.serial(:type => "pty") do
+                    xml.target(:port => 0)
+                  end
+                  xml.console(:type => "pty") do
+                    xml.target(:port => 0)
+                  end
+                  xml.input(:type => "tablet", :bus => "usb")
+                  xml.input(:type => "mouse", :bus => "ps2")
+
+                  graphics = xml.graphics(:type => display[:type])
+                  if display[:port].empty?
+                    graphics.port = display[:port]
+                    graphics.autoport = "no"
+                  else
+                    graphics.port = -1
+                    graphics.autoport = "yes"
+                  end
+                  graphics.listen = display[:listen] unless display[:listen].empty?
+                  graphics.password = display[:password] unless display[:password].empty?
+
+                  xml.video do
+                    xml.model(:type => "cirrus", :vram => 9216, :heads => 1)
+                  end
+                end
+              end
+            end
+          end
+
+          builder.to_xml
+        end
+        # rubocop:enable Metrics
+
         private
         attr_accessor :volumes_path
+
+        def read_ceph_args(path = "/etc/foreman/ceph.conf")
+          return unless File.file?(path)
+
+          args = {}
+
+          File.readlines(path).each do |line|
+            pair = line.strip.split("=")
+            key = pair[0]
+            value = pair[1]
+            args[key] = value
+          end
+
+          args
+        end
 
         # This tests the library version before redefining the address
         # method for this instance to use a method compatible with

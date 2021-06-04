@@ -59,5 +59,8 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       end
     end
     test('be a kind of Fog::Libvirt::Compute::Server') { server.kind_of? Fog::Libvirt::Compute::Server }
+    tests("serializes to xml") do
+      test("with memory") { server.to_xml.match?(%r{<memory>\d+</memory>}) }
+    end
   end
 end
