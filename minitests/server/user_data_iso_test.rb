@@ -32,7 +32,6 @@ class UserDataIsoTest < Minitest::Test
   end
 
   def test_volume_is_created_during_user_data_iso_generation
-    iso_path = "iso_file_path"
     @server.stubs(:system).returns(true)
     Fog::Libvirt::Compute::Volumes.any_instance.expects(:create).
         with(has_entries(:name => @server.cloud_init_volume_name)).
@@ -43,7 +42,6 @@ class UserDataIsoTest < Minitest::Test
   end
 
   def test_volume_is_uploaded_during_user_data_iso_generation
-    iso_path = "iso_file_path"
     @server.stubs(:system).returns(true)
     Fog::Libvirt::Compute::Volumes.any_instance.stubs(:create).returns(@compute.volumes.new)
     Fog::Libvirt::Compute::Volume.any_instance.expects(:upload_image).returns(true)
@@ -52,7 +50,6 @@ class UserDataIsoTest < Minitest::Test
   end
 
   def test_iso_file_is_set_during_user_data_iso_generation
-    iso_path = "iso_file_path"
     @server.stubs(:system).returns(true)
     Fog::Libvirt::Compute::Volumes.any_instance.stubs(:create).returns(@compute.volumes.new)
     Fog::Libvirt::Compute::Volume.any_instance.stubs(:upload_image)
