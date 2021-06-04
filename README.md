@@ -2,7 +2,7 @@
 
 fog-libvirt is a libvirt provider for [fog](https://github.com/fog/fog).
 
-[![Build Status](https://github.com/fog/fog-libvirt/actions/workflows/ruby.yml/badge.svg)](https://github.com/fog/fog-libvirt/workflows/ruby.yml)
+[![Build Status](https://github.com/fog/fog-libvirt/actions/workflows/ruby.yml/badge.svg)](https://github.com/fog/fog-libvirt/actions/workflows/ruby.yml)
 [![Dependency Status](https://gemnasium.com/fog/fog.png)](https://gemnasium.com/fog/fog-libvirt)
 [![Code Climate](https://codeclimate.com/github/fog/fog.png)](https://codeclimate.com/github/fog/fog-libvirt)
 [![Gem Version](https://fury-badge.herokuapp.com/rb/fog.png)](http://badge.fury.io/rb/fog-libvirt)
