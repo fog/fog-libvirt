@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-require 'mocha/mini_test'
+require 'mocha/minitest'
 require 'fileutils'
 
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
