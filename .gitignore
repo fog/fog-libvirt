@@ -26,4 +26,5 @@ tags
 tests/digitalocean/fixtures/
 .ruby-gemset
 .ruby-version
+/logs
 providers/*/doc

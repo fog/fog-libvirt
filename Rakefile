@@ -39,25 +39,25 @@ task :default => [:test, :minitest]
 Rake::TestTask.new(:minitest) do |t|
   t.libs << '.'
   t.libs << 'lib'
-  t.libs << 'minitests'
-  t.test_files  =  Dir.glob('minitests/**/*_test.rb')
+  t.libs << 'tests/mini'
+  t.test_files  =  Dir.glob('tests/mini/**/*_test.rb')
   t.verbose = true
 end
 
 desc 'Run tests'
 task :test do
   mock = ENV['FOG_MOCK'] || 'true'
-  sh("export FOG_MOCK=#{mock} && bundle exec shindont tests")
+  sh("export FOG_MOCK=#{mock} && bundle exec shindont tests/unit")
 end
 
 desc 'Run mocked tests'
 task :mock do
-  sh("export FOG_MOCK=true && bundle exec shindont tests")
+  sh("export FOG_MOCK=true && bundle exec shindont tests/unit")
 end
 
 desc 'Run live tests'
 task :live do
-  sh("export FOG_MOCK=false && bundle exec shindont tests")
+  sh("export FOG_MOCK=false && bundle exec shindont tests/unit")
 end
 
 desc "Open an irb session preloaded with this library"

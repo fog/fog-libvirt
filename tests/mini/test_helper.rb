@@ -4,7 +4,7 @@ require 'fileutils'
 
 $: << File.join(File.dirname(__FILE__), '..', 'lib')
 
-logdir = File.join(File.dirname(__FILE__), '..', 'logs')
+logdir = File.join(File.dirname(__FILE__), '..', '..', 'logs')
 FileUtils.mkdir_p(logdir) unless File.exist?(logdir)
 
 ENV['TMPDIR'] = 'test/tmp'
