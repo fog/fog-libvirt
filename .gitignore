@@ -24,5 +24,6 @@ spec/credentials.yml
 vendor/*
 tags
 tests/digitalocean/fixtures/
-
+.ruby-gemset
+.ruby-version
 providers/*/doc
