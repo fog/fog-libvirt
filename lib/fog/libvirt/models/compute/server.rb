@@ -90,9 +90,13 @@ module Fog
           volumes.first.path if volumes and volumes.first
         end
 
-        def destroy(options={ :destroy_volumes => false})
+        def destroy(options={ :destroy_volumes => false, :flags => 0 })
           poweroff unless stopped?
-          service.vm_action(uuid, :undefine)
+          if options[:flags].zero?
+            service.vm_action(uuid, :undefine)
+          else
+            service.vm_action(uuid, :undefine, options[:flags])
+          end
           volumes.each { |vol| vol.destroy } if options[:destroy_volumes]
           true
         end
