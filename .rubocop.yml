@@ -18,3 +18,6 @@ SignalException:
   Description: 'Do not enforce use of fail when raising exceptions.'
   # Valid values are: semantic, only_raise and only_fail
   EnforcedStyle: only_raise
+
+Metrics/ClassLength:
+  Enabled: false
