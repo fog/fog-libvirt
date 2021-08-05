@@ -66,7 +66,7 @@ module Fog
         end
 
         def domain_to_attributes(dom)
-          states= %w(nostate running blocked paused shutting-down shutoff crashed)
+          states= %w(nostate running blocked paused shutting-down shutoff crashed pmsuspended)
 
           begin
             {
