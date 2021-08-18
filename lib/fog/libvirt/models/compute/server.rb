@@ -143,7 +143,7 @@ module Fog
 
         def volumes
           # lazy loading of volumes
-          @volumes ||= (@volumes_path || []).map{|path| service.volumes.all(:path => path).first }
+          @volumes ||= (@volumes_path || []).map{|path| service.volumes.all(:path => path).first }.compact
         end
 
         def private_ip_address
