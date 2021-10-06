@@ -92,7 +92,7 @@ module Fog
 
         def destroy(options={ :destroy_volumes => false})
           poweroff unless stopped?
-          service.vm_action(uuid, :undefine)
+          service.vm_action(uuid, :undefine, 4) # Remove NVRAM if exists
           volumes.each { |vol| vol.destroy } if options[:destroy_volumes]
           true
         end
