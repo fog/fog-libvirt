@@ -23,7 +23,7 @@ jobs:
     continue-on-error: ${{ matrix.ruby-version == '3.0' || matrix.ruby-version == 'head' }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Update apt-get
       run: sudo apt-get update -qq
     - name: Install libvirt-dev
