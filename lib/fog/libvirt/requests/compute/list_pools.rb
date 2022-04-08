@@ -50,16 +50,9 @@ module Fog
 
       class Mock
         def list_pools(filter = { })
-          @pool_data.map do |pool|
-            Compute::Real.send(:pool_to_attributes, pool, filter[:include_inactive])
-          end.compact
-        end
-
-        def initialize(options = { })
-          @pool_data = [
-            FakePool.new(mock_pool('pool1')),
-            FakePool.new(mock_pool('pool1'))
-          ]
+          pool1 = mock_pool 'pool1'
+          pool2 = mock_pool 'pool1'
+          [pool1, pool2]
         end
 
         def mock_pool name
@@ -69,53 +62,11 @@ module Fog
               :autostart      => true,
               :active         => true,
               :name           => name,
-              :info           => {
-                :allocation     => 123456789,
-                :capacity       => 123456789,
-                :state          => 2 # running
-              },
-              :num_of_volumes => 3
+              :allocation     => 123456789,
+              :capacity       => 123456789,
+              :num_of_volumes => 3,
+              :state          => 2 # running
           }
-        end
-
-        def add_pool(pool_attributes)
-          @pool_data.append(FakePool.new(pool_attributes))
-        end
-
-        class FakePool < Fog::Model
-          # Fake pool object to allow exercising the internal parsing of pools
-          # returned by the client queries
-          identity :uuid
-
-          attribute :persistent
-          attribute :autostart
-          attribute :active
-          attribute :name
-          attribute :num_of_volumes
-          attr_reader :info
-
-          class FakeInfo < Fog::Model
-            attribute :allocation
-            attribute :capacity
-            attribute :state
-          end
-
-          def initialize(attributes = { })
-            @info = FakeInfo.new(attributes.delete(:info))
-            super(attributes)
-          end
-
-          def active?
-            active
-          end
-
-          def autostart?
-            autostart
-          end
-
-          def persistent?
-            persistent
-          end
         end
       end
     end
