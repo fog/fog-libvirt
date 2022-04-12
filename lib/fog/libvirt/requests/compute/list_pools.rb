@@ -65,7 +65,7 @@ module Fog
               :allocation     => 123456789,
               :capacity       => 123456789,
               :num_of_volumes => 3,
-              :state          => 2 # running
+              :state          => :running
           }
         end
       end
