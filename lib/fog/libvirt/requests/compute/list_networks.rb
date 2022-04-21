@@ -44,8 +44,8 @@ module Fog
       end
 
       class Mock
-        def list_networks(filters={ })
-          [ {
+        def list_networks(filter={ })
+          networks = [ {
               :uuid        => 'a29146ea-39b2-412d-8f53-239eef117a32',
               :name        => 'net1',
               :bridge_name => 'virbr0'
@@ -56,6 +56,16 @@ module Fog
               :bridge_name => 'virbr1'
             }
           ]
+          return networks if filter.empty?
+
+          case filter.keys.first
+            when :uuid
+              [networks.find(:uuid => filter[:uuid]).first]
+            when :name
+              [networks.find(:name => filter[:name]).first]
+            else
+              networks
+          end
         end
       end
     end
