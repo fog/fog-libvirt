@@ -411,13 +411,11 @@ module Fog
           ip_address = nil
           nic = self.nics.find {|nic| nic.mac==mac}
           if !nic.nil?
-            service.networks.all.each do |net|
-              if net.name == nic.network
-                leases = net.dhcp_leases(mac, 0)
-                # Assume the lease expiring last is the current IP address
-                ip_address = leases.sort_by { |lse| lse["expirytime"] }.last["ipaddr"] if !leases.empty?
-                break
-              end
+            net = service.networks.all(:name => nic.network).first
+            if !net.nil?
+              leases = net.dhcp_leases(mac, 0)
+              # Assume the lease expiring last is the current IP address
+              ip_address = leases.sort_by { |lse| lse["expirytime"] }.last["ipaddr"] if !leases.empty?
             end
           end
 
