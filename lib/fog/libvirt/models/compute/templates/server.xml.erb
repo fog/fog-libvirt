@@ -72,9 +72,9 @@
       <% end %>
     </disk>
   <% else %>
-    <disk type='file' device='disk'>
+    <disk type='block' device='disk'>
       <driver name='qemu' type='<%= vol.format_type %>'/>
-      <source file='<%= vol.path %>'/>
+      <source dev='<%= vol.path %>'/>
       <%# we need to ensure a unique target dev -%>
       <target dev='vd<%= ('a'..'z').to_a[volumes.index(vol)] %>' bus='virtio'/>
     </disk>
