@@ -59,11 +59,11 @@ Shindo.tests("Fog::Compute[:libvirt] | list_pools request", 'libvirt') do
       :num_of_volumes => 3
     }
 
-    response = ::Fog::Libvirt::Compute::Real.send(:pool_to_attributes, FakePool.new(inactive_pool), true)
+    response = compute.send(:pool_to_attributes, FakePool.new(inactive_pool), true)
 
     test("should be hash of attributes") { response.kind_of? Hash }
 
-    response = ::Fog::Libvirt::Compute::Real.send(:pool_to_attributes, FakePool.new(inactive_pool))
+    response = compute.send(:pool_to_attributes, FakePool.new(inactive_pool))
 
     test("should be nil") { response.nil? }
 
