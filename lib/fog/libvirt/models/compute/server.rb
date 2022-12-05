@@ -92,7 +92,7 @@ module Fog
 
         def destroy(options={ :destroy_volumes => false, :flags => 0 })
           poweroff unless stopped?
-          if options[:flags].zero?
+          if options.fetch(:flags, 0).zero?
             service.vm_action(uuid, :undefine)
           else
             service.vm_action(uuid, :undefine, options[:flags])
