@@ -39,13 +39,9 @@ module Fog
         end
 
         def domain_volumes xml
-          vols_by_file = xml_elements(xml, "domain/devices/disk/source", "file")
-          vols_by_name = xml_elements(xml, "domain/devices/disk/source", "name")
-          vols = []
-          vols_by_file.zip(vols_by_name).each do |by_file,by_name|
-            vols.push(by_file.nil? ? by_name : by_file)
+          xml_elements(xml, "domain/devices/disk/source").map do |element|
+            element[:file] || element[:dev] || element[:name]
           end
-          vols
         end
 
         def boot_order xml
