@@ -109,7 +109,7 @@ module Fog
               :memory_size     => 6,
               :cpus            => 5,
               :autostart       => false,
-              :os_type         => "RHEL6",
+              :os_type         => "hvm",
               :active          => false,
               :vnc_port        => 5910,
               :boot_order      => boot_order(xml),
