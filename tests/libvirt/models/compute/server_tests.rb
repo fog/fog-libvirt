@@ -77,6 +77,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         xml = server.to_xml
         xml.match?(/<disk type="block" device="disk">/) && xml.match?(%r{<source dev="/dev/sda"/>})
       end
+      test("with q35 machine type on x86_64") { server.to_xml.match?(%r{<type arch="x86_64" machine="q35">hvm</type>}) }
     end
   end
 end

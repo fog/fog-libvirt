@@ -282,7 +282,8 @@ module Fog
 
               xml.vcpu(cpus)
               xml.os do
-                xml.type(os_type, :arch => arch)
+                type = xml.type(os_type, :arch => arch)
+                type[:machine] = "q35" if ["i686", "x86_64"].include?(arch)
 
                 boot_order.each do |dev|
                   xml.boot(:dev => dev)
@@ -291,7 +292,6 @@ module Fog
               xml.features do
                 xml.acpi
                 xml.apic
-                xml.pae
               end
 
               unless cpu.empty?
@@ -308,7 +308,11 @@ module Fog
                 end
               end
 
-              xml.clock(:offset => "utc")
+              xml.clock(:offset => "utc") do
+                xml.timer(:name => "rtc", :tickpolicy => "catchup")
+                xml.timer(:name => "pit", :tickpolicy => "delay")
+                xml.timer(:name => "hpet", :present => "no")
+              end
 
               xml.devices do
                 ceph_args = read_ceph_args
