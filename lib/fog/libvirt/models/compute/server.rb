@@ -479,7 +479,7 @@ module Fog
           {
             :persistent             => true,
             :cpus                   => 1,
-            :memory_size            => 256 *1024,
+            :memory_size            => 256 * 1024,
             :name                   => randomized_name,
             :os_type                => "hvm",
             :arch                   => "x86_64",
