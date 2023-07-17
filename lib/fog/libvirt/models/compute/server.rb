@@ -331,9 +331,14 @@ module Fog
                       xml.target(:dev => target_device, :bus => args["bus_type"] == "virtio" ? "virtio" : "scsi")
                     end
                   else
-                    xml.disk(:type => "file", :device => "disk") do
+                    is_block = volume.path.start_with?("/dev/")
+                    xml.disk(:type => is_block ? "block" : "file", :device => "disk") do
                       xml.driver(:name => "qemu", :type => volume.format_type)
-                      xml.source(:file => volume.path)
+                      if is_block
+                        xml.source(:dev => volume.path)
+                      else
+                        xml.source(:file => volume.path)
+                      end
                       xml.target(:dev => target_device, :bus => "virtio")
                     end
                   end

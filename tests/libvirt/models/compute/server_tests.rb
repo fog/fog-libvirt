@@ -61,6 +61,22 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
     test('be a kind of Fog::Libvirt::Compute::Server') { server.kind_of? Fog::Libvirt::Compute::Server }
     tests("serializes to xml") do
       test("with memory") { server.to_xml.match?(%r{<memory>\d+</memory>}) }
+      test("with disk of type file") do
+        xml = server.to_xml
+        xml.match?(/<disk type="file" device="disk">/) && xml.match?(%r{<source file="path/to/disk"/>})
+      end
+      test("with disk of type block") do
+        server = Fog::Libvirt::Compute::Server.new(
+          {
+            :nics => [],
+            :volumes => [
+              Fog::Libvirt::Compute::Volume.new({ :path => "/dev/sda", :pool_name => "dummy" })
+            ]
+          }
+        )
+        xml = server.to_xml
+        xml.match?(/<disk type="block" device="disk">/) && xml.match?(%r{<source dev="/dev/sda"/>})
+      end
     end
   end
 end
