@@ -36,8 +36,8 @@ class ServerTest < Minitest::Test
   end
 
   def test_ssh_ip_command_success
-    fog_ssh = MiniTest::Mock.new
-    result = MiniTest::Mock.new
+    fog_ssh = Minitest::Mock.new
+    result = Minitest::Mock.new
     result.expect(:status, 0)
     result.expect(:stdout, "any_ip")
     fog_ssh.expect(:run, [result], [String])
@@ -49,10 +49,10 @@ class ServerTest < Minitest::Test
   end
 
   def test_local_ip_command_success
-    proc_info = MiniTest::Mock.new
+    proc_info = Minitest::Mock.new
     proc_info.expect(:each_line, "127.0.0.1")
     proc_info.expect(:pid, 0)
-    status = MiniTest::Mock.new
+    status = Minitest::Mock.new
     status.expect(:exitstatus, 0)
     Process.stubs(:waitpid2).returns([0, status])
     IO.stub(:popen, true, proc_info) do
