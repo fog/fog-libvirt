@@ -295,12 +295,16 @@ module Fog
               end
 
               unless cpu.empty?
-                if cpu[:mode]
-                  xml.cpu(:mode => cpu[:mode])
-                else
+                if cpu.dig(:model, :name)
                   xml.cpu do
                     xml.model(cpu.dig(:model, :name), :fallback => cpu.dig(:model, :fallback) || "allow")
                   end
+                else
+                  xml.cpu(
+                    :mode => cpu.dig(:model, :name) || "host-passthrough",
+                    :check => cpu.fetch(:check, "none"),
+                    :migratable => cpu.fetch(:migratable, "on")
+                  )
                 end
               end
 
