@@ -13,7 +13,9 @@ module Fog
 
         attribute :cpus
         attribute :cputime
+        attribute :os_firmware
         attribute :os_type
+        attribute :os_loader
         attribute :memory_size
         attribute :max_memory_size
         attribute :name
@@ -281,9 +283,27 @@ module Fog
               end
 
               xml.vcpu(cpus)
-              xml.os do
+
+              os_tags = {}
+
+              # Secure boot and stateless UEFI both imply an EFI firmware
+              if ["secure", "stateless"].include?(os_loader)
+                os_tags[:firmware] = "efi"
+              elsif os_firmware
+                os_tags[:firmware] = os_firmware
+              end
+
+              xml.os(**os_tags) do
                 type = xml.type(os_type, :arch => arch)
                 type[:machine] = "q35" if ["i686", "x86_64"].include?(arch)
+
+                # TODO: can you use both secure and stateless at the same time?
+                case attributes[:os_loader]
+                when "secure"
+                  xml.loader(:secure => "yes")
+                when "stateless"
+                  xml.loader(:stateless => "yes")
+                end
 
                 boot_order.each do |dev|
                   xml.boot(:dev => dev)
