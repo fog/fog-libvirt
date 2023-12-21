@@ -79,6 +79,47 @@ module Fog
           service.upload_volume(pool_name, name, file_path)
         end
 
+        def to_xml
+          builder = Nokogiri::XML::Builder.new do |xml|
+            xml.volume do
+              xml.name(name)
+
+              allocation_size, allocation_unit = split_size_unit(allocation)
+              xml.allocation(allocation_size, :unit => allocation_unit)
+
+              capacity_size, capacity_unit = split_size_unit(capacity)
+              xml.capacity(capacity_size, :unit => capacity_unit)
+
+              xml.target do
+                xml.format(:type => format_type)
+
+                xml.permissions do
+                  xml.owner(owner) if owner
+                  xml.group(group) if group
+                  xml.mode('0744')
+                  xml.label('virt_image_t')
+                end
+              end
+
+              if backing_volume
+                xml.backingStore do
+                  xml.path(backing_volume.path)
+                  xml.format(:type => backing_volume.format_type)
+
+                  xml.permissions do
+                    xml.owner(owner) if owner
+                    xml.group(group) if group
+                    xml.mode('0744')
+                    xml.label('virt_image_t')
+                  end
+                end
+              end
+            end
+          end
+
+          builder.to_xml
+        end
+
         private
 
         def image_suffix

@@ -30,12 +30,14 @@ Shindo.tests('Fog::Compute[:libvirt] | network model', ['libvirt']) do
 
   tests("to_xml") do
     test("default") do
-      begin
-        network.to_xml
-        false
-      rescue NameError # forward_mode is undefined
-        true
-      end
+      expected = <<~NETWORK
+        <?xml version="1.0"?>
+        <network>
+          <name>default</name>
+          <bridge name="virbr0" stp="on" delay="0"/>
+        </network>
+      NETWORK
+      network.to_xml == expected
     end
   end
 end

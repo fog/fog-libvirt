@@ -78,6 +78,20 @@ module Fog
         def volumes
           service.list_pool_volumes uuid
         end
+
+        def to_xml
+          builder = Nokogiri::XML::Builder.new do |xml|
+            xml.pool(:type => 'dir') do
+              xml.name(name)
+
+              xml.target do
+                xml.path(path)
+              end
+            end
+          end
+
+          builder.to_xml
+        end
       end
     end
   end
