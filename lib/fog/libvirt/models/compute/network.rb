@@ -27,6 +27,17 @@ module Fog
         def shutdown
           service.destroy_network(uuid)
         end
+
+        def to_xml
+          builder = Nokogiri::XML::Builder.new do |xml|
+            xml.network do
+              xml.name(name)
+              xml.bridge(:name => bridge_name, :stp => 'on', :delay => '0')
+            end
+          end
+
+          builder.to_xml
+        end
       end
     end
   end
