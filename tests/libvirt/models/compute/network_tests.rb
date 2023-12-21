@@ -28,4 +28,16 @@ Shindo.tests('Fog::Compute[:libvirt] | network model', ['libvirt']) do
     test('be a kind of Fog::Libvirt::Compute::Network') { network.kind_of? Fog::Libvirt::Compute::Network }
   end
 
+  tests("to_xml") do
+    test("default") do
+      expected = <<~NETWORK
+      <?xml version="1.0"?>
+      <network>
+        <name>net2</name>
+        <bridge name="virbr1" stp="on" delay="0"/>
+      </network>
+      NETWORK
+      network.to_xml == expected
+    end
+  end
 end
