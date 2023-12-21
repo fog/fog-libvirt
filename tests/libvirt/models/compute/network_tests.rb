@@ -28,4 +28,14 @@ Shindo.tests('Fog::Compute[:libvirt] | network model', ['libvirt']) do
     test('be a kind of Fog::Libvirt::Compute::Network') { network.kind_of? Fog::Libvirt::Compute::Network }
   end
 
+  tests("to_xml") do
+    test("default") do
+      begin
+        network.to_xml
+        false
+      rescue NameError # forward_mode is undefined
+        true
+      end
+    end
+  end
 end
