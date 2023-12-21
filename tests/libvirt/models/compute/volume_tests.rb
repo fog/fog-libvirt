@@ -35,4 +35,23 @@ Shindo.tests('Fog::Compute[:libvirt] | volume model', ['libvirt']) do
     test('succeed') { volume.xml == new_vol.xml }
   end
 
+  test('to_xml') do
+    test('default') do
+      expected = <<~VOLUME
+        <volume>
+                <name>fog_test</name>
+                <allocation unit="G">1</allocation>
+                <capacity unit="G">10</capacity>
+                <target>
+                  <format type="raw"/>
+                  <permissions>
+                                            <mode>0744</mode>
+                    <label>virt_image_t</label>
+                  </permissions>
+                </target>
+                </volume>
+      VOLUME
+      volume.to_xml == expected
+    end
+  end
 end
