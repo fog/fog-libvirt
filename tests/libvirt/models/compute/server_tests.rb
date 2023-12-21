@@ -30,6 +30,8 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       attributes = [ :id,
         :cpus,
         :cputime,
+        :os_firmware,
+        :os_loader,
         :os_type,
         :memory_size,
         :max_memory_size,
@@ -60,6 +62,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
     end
     test('be a kind of Fog::Libvirt::Compute::Server') { server.kind_of? Fog::Libvirt::Compute::Server }
     tests("serializes to xml") do
+      test("without firmware") { server.to_xml.include?("<os>") }
       test("with memory") { server.to_xml.match?(%r{<memory>\d+</memory>}) }
       test("with disk of type file") do
         xml = server.to_xml
@@ -78,6 +81,27 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         xml.match?(/<disk type="block" device="disk">/) && xml.match?(%r{<source dev="/dev/sda"/>})
       end
       test("with q35 machine type on x86_64") { server.to_xml.match?(%r{<type arch="x86_64" machine="q35">hvm</type>}) }
+      test("with efi firmware") do
+        server = Fog::Libvirt::Compute::Server.new(
+          {
+            :os_firmware => "efi",
+            :nics => [],
+            :volumes => []
+          }
+        )
+        server.to_xml.include?('<os firmware="efi">')
+      end
+      test("with secure boot") do
+        server = Fog::Libvirt::Compute::Server.new(
+          {
+            :os_loader => "secure",
+            :nics => [],
+            :volumes => []
+          }
+        )
+        xml = server.to_xml
+        xml.include?('<os firmware="efi">') && xml.include?('<loader secure="yes"/>')
+      end
     end
   end
 end
