@@ -357,9 +357,9 @@ module Fog
                   xml.disk(:type => "file", :device => "cdrom") do
                     xml.driver(:name => "qemu", :type => "raw")
                     xml.source(:file => "#{iso_dir}/#{iso_file}")
-                    xml.target(:dev => "hdc", :bus => "ide")
+                    xml.target(:dev => "sda", :bus => "scsi")
                     xml.readonly
-                    xml.address(:type => "drive", :controller => 0, :bus => 1, :unit => 0)
+                    xml.address(:type => "drive", :controller => 0, :bus => 0, :unit => 0)
                   end
                 end
 
