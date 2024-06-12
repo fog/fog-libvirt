@@ -408,7 +408,7 @@ module Fog
                     graphics.autoport = "yes"
                   end
                   graphics.listen = display[:listen] unless display[:listen].empty?
-                  graphics.password = display[:password] unless display[:password].empty?
+                  graphics.passwd = display[:password] unless display[:password].empty?
 
                   xml.video do
                     xml.model(:type => "cirrus", :vram => 9216, :heads => 1)
