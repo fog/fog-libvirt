@@ -83,7 +83,7 @@ module Fog
         end
 
         def mac
-          nics.first.mac if nics && nics.first
+          nics&.first&.mac
         end
 
         def disk_path
@@ -452,11 +452,8 @@ module Fog
           nic = self.nics.find {|nic| nic.mac==mac}
           if !nic.nil?
             net = service.networks.all(:name => nic.network).first
-            if !net.nil?
-              leases = net.dhcp_leases(mac, 0)
-              # Assume the lease expiring last is the current IP address
-              ip_address = leases.sort_by { |lse| lse["expirytime"] }.last["ipaddr"] if !leases.empty?
-            end
+            # Assume the lease expiring last is the current IP address
+            ip_address = net&.dhcp_leases(mac)&.max_by { |lse| lse["expirytime"] }&.dig("ipaddr")
           end
 
           return { :public => [ip_address], :private => [ip_address] }
@@ -466,7 +463,7 @@ module Fog
         DOMAIN_CLEANUP_REGEXP = Regexp.compile('[\W_-]')
 
         def ip_address(key)
-          addresses[key].nil? ? nil : addresses[key].first
+          addresses[key]&.first
         end
 
         def initialize_nics
