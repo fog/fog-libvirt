@@ -39,7 +39,8 @@ module Fog
 
           raise Fog::Errors::Error.new('Reserving an existing volume may create a duplicate') if key
           @xml ||= to_xml
-          self.path = service.create_volume(pool_name, xml).path
+          self.id = service.create_volume(pool_name, xml).key
+          reload
         end
 
         # Destroy a volume
@@ -68,8 +69,8 @@ module Fog
           new_volume      = self.dup
           new_volume.key  = nil
           new_volume.name = new_name
-          new_volume.path = service.clone_volume(pool_name, new_volume.to_xml, self.name).path
 
+          new_volume.id = service.clone_volume(pool_name, new_volume.to_xml, self.name).key
           new_volume.reload
         end
 
