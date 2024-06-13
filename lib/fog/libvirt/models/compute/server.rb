@@ -410,7 +410,7 @@ module Fog
                     graphics.autoport = "yes"
                   end
                   graphics.listen = display[:listen] unless display[:listen].empty?
-                  graphics.passwd = display[:password] unless display[:password].empty?
+                  graphics.passwd = display[:password] if display[:password] && !display[:password].empty?
 
                   xml.video do
                     xml.model(:type => "cirrus", :vram => 9216, :heads => 1)
@@ -546,7 +546,7 @@ module Fog
         end
 
         def default_display
-          {:port => '-1', :listen => '127.0.0.1', :type => 'vnc', :password => '' }
+          {:port => '-1', :listen => '127.0.0.1', :type => 'vnc' }
         end
       end
     end
