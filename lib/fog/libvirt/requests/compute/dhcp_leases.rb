@@ -28,9 +28,7 @@ module Fog
             'dd8fe884-6c02-601e-7551-cca97df1c5df' => leases1,
             'fbd4ac68-cbea-4f95-86ed-22953fd92384' => leases2
           }
-          if !networks[uuid].nil?
-            return networks[uuid][mac]
-          end
+          networks.dig(uuid, mac)
         end
       end
     end
