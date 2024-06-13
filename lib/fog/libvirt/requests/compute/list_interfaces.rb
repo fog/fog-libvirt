@@ -1,7 +1,7 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def list_interfaces(filter = { })
           data=[]
           if filter.keys.empty?
@@ -37,20 +37,12 @@ module Fog
         end
       end
 
-      class Mock
-        def list_interfaces(filters={ })
-          if1 = mock_interface 'if1'
-          if2 = mock_interface 'if2'
-          [if1, if2]
-        end
+      class Real
+        include Shared
+      end
 
-        def mock_interface name
-          {
-              :mac    => 'aa:bb:cc:dd:ee:ff',
-              :name   => name,
-              :active => true
-          }
-        end
+      class Mock
+        include Shared
       end
     end
   end

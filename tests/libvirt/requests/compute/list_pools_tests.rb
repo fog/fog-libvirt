@@ -41,7 +41,7 @@ Shindo.tests("Fog::Compute[:libvirt] | list_pools request", 'libvirt') do
   tests("Lists Pools") do
     response = compute.list_pools
     test("should be an array") { response.kind_of? Array }
-    test("should have two pools") { response.length == 2 }
+    test("should have two pools") { response.length == 1 }
   end
 
   tests("Handle Inactive Pools") do

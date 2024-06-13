@@ -1,7 +1,7 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def list_pool_volumes(uuid)
           pool = client.lookup_storage_pool_by_uuid uuid
           pool.list_volumes.map do |volume_name|
@@ -10,9 +10,12 @@ module Fog
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def list_pool_volumes(uuid)
-        end
+        include Shared
       end
     end
   end

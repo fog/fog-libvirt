@@ -1,7 +1,7 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def list_volumes(filter = { })
           data = []
           if filter.keys.empty?
@@ -74,32 +74,12 @@ module Fog
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def list_volumes(filters={ })
-          vol1 = mock_volume 'vol1'
-          vol2 = mock_volume 'vol2'
-          vols = [vol1, vol2]
-
-          if filters.keys.empty?
-            return vols
-          end
-
-          key = filters.keys.first
-          vols.select { |v| v[key] == filters[key] }
-        end
-
-        def mock_volume name
-          {
-              :pool_name   => 'vol.pool.name',
-              :key         => "vol.#{name}", # needs to match id
-              :id          => "vol.#{name}",
-              :path        => "path/to/disk", # used by in mock_files/domain.xml
-              :name        => name,
-              :format_type => 'raw',
-              :allocation  => 123,
-              :capacity    => 123,
-          }
-        end
+        include Shared
       end
     end
   end

@@ -1,7 +1,7 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def update_display(options = { })
           raise ArgumentError, "uuid is a required parameter" unless options.key? :uuid
 
@@ -25,11 +25,12 @@ module Fog
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def update_display(options = { })
-          raise ArgumentError, "uuid is a required parameter" unless options.key? :uuid
-          true
-        end
+        include Shared
       end
     end
   end

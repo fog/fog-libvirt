@@ -1,6 +1,7 @@
 Shindo.tests('Fog::Compute[:libvirt] | nic model', ['libvirt']) do
 
-  nic = Fog::Compute[:libvirt].servers.all.select{|v| v.name =~ /^fog/}.first.nics.first
+  server = Fog::Compute[:libvirt].servers.create(:name => Fog::Mock.random_letters(8))
+  nic = server.nics.first
 
   tests('The nic model should') do
     tests('have the action') do

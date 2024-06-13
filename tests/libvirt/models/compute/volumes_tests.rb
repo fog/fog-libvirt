@@ -2,6 +2,8 @@ Shindo.tests('Fog::Compute[:libvirt] | volumes collection', ['libvirt']) do
 
   volumes = Fog::Compute[:libvirt].volumes
 
+  volumes.create(:name => 'test')
+
   tests('The volumes collection') do
     test('should not be empty') { not volumes.empty? }
     test('should be a kind of Fog::Libvirt::Compute::Volumes') { volumes.kind_of? Fog::Libvirt::Compute::Volumes }

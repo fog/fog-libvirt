@@ -6,7 +6,4 @@ group :development, :test do
   gem "octokit", :require => false
 end
 
-# 0.8.3 breaks our tests
-gem "ruby-libvirt", ">= 0.7.0", "< 0.8.3"
-
 gemspec

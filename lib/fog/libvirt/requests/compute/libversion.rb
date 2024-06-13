@@ -2,16 +2,18 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def libversion()
           client.libversion
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def libversion()
-          return 1002009
-        end
+        include Shared
       end
     end
   end

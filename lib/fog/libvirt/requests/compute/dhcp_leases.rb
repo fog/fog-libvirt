@@ -10,6 +10,7 @@ module Fog
       end
 
       class Mock
+        # Not implemented by the test driver
         def dhcp_leases(uuid, mac, flags = 0)
           leases1 = {
             'aa:bb:cc:dd:ee:ff' => [
@@ -23,8 +24,8 @@ module Fog
             ]
           }
           networks = {
-            # should match mock net uuid from list_networks.rb
-            'a29146ea-39b2-412d-8f53-239eef117a32' => leases1,
+            # should match the default network from the test connection
+            'dd8fe884-6c02-601e-7551-cca97df1c5df' => leases1,
             'fbd4ac68-cbea-4f95-86ed-22953fd92384' => leases2
           }
           if !networks[uuid].nil?

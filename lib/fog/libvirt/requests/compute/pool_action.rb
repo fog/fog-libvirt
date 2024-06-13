@@ -1,7 +1,7 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def pool_action(uuid, action)
           pool = client.lookup_storage_pool_by_uuid uuid
           pool.send(action)
@@ -9,10 +9,12 @@ module Fog
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def pool_action(uuid, action)
-          true
-        end
+        include Shared
       end
     end
   end

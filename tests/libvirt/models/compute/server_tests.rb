@@ -1,7 +1,9 @@
 Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
 
   servers = Fog::Compute[:libvirt].servers
-  server = servers.all.select{|v| v.name =~ /^fog/}.last
+  # Match the mac in dhcp_leases mock
+  nics = Fog.mock? ? [{ :type => 'network', :network => 'default', :mac => 'aa:bb:cc:dd:ee:ff' }] : nil
+  server = servers.create(:name => Fog::Mock.random_letters(8), :nics => nics)
 
   tests('The server model should') do
     tests('have the action') do
@@ -63,7 +65,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       test("with memory") { server.to_xml.match?(%r{<memory>\d+</memory>}) }
       test("with disk of type file") do
         xml = server.to_xml
-        xml.match?(/<disk type="file" device="disk">/) && xml.match?(%r{<source file="path/to/disk"/>})
+        xml.match?(/<disk type="file" device="disk">/) && xml.match?(%r{<source file="#{server.volumes.first.path}"/>})
       end
       test("with disk of type block") do
         server = Fog::Libvirt::Compute::Server.new(

@@ -1,7 +1,7 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def list_domains(filter = { })
           data=[]
 
@@ -25,9 +25,7 @@ module Fog
         rescue ::Libvirt::RetrieveError, ::Libvirt::Error
           nil
         end
-      end
 
-      module Shared
         private
 
         def domain_display xml
@@ -90,34 +88,12 @@ module Fog
         end
       end
 
-      class Mock
-        def list_domains(filter = { })
-          dom1 = mock_domain 'fog-dom1'
-          dom2 = mock_domain 'fog-dom2'
-          dom3 = mock_domain 'a-fog-dom3'
-          [dom1, dom2, dom3]
-        end
+      class Real
+        include Shared
+      end
 
-        def mock_domain name
-          xml = read_xml 'domain.xml'
-          {
-              :id              => "dom.uuid",
-              :uuid            => "dom.uuid",
-              :name            => name,
-              :max_memory_size => 8,
-              :cputime         => 7,
-              :memory_size     => 6,
-              :cpus            => 5,
-              :autostart       => false,
-              :os_type         => "hvm",
-              :active          => false,
-              :vnc_port        => 5910,
-              :boot_order      => boot_order(xml),
-              :nics            => domain_interfaces(xml),
-              :volumes_path    => domain_volumes(xml),
-              :state           => 'shutoff'
-          }
-        end
+      class Mock
+        include Shared
       end
     end
   end

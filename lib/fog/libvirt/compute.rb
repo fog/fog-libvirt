@@ -49,34 +49,12 @@ module Fog
 
       module Shared
         include Fog::Libvirt::Util
-      end
 
-      class Mock
-        include Shared
-        def initialize(options={})
-          # libvirt is part of the gem => ruby-libvirt
-          require 'libvirt'
-        end
-
-        private
-
-        def client
-          return @client if defined?(@client)
-        end
-
-        #read mocks xml
-        def read_xml(file_name)
-          file_path = File.join(File.dirname(__FILE__),"requests","compute","mock_files",file_name)
-          File.read(file_path)
-        end
-      end
-
-      class Real
-        include Shared
         attr_reader :client
         attr_reader :uri
 
         def initialize(options={})
+          super()
           @uri = ::Fog::Libvirt::Util::URI.new(enhance_uri(options[:libvirt_uri]))
 
           # libvirt is part of the gem => ruby-libvirt
@@ -131,6 +109,14 @@ module Fog
           end
           uri+append
         end
+      end
+
+      class Real
+        include Shared
+      end
+
+      class Mock
+        include Shared
       end
     end
   end

@@ -1,17 +1,19 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def volume_action(key, action, options={})
           get_volume({:key => key}, true).send(action)
           true
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def volume_action(action, options={})
-          true
-        end
+        include Shared
       end
     end
   end

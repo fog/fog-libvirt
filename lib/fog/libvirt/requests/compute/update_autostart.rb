@@ -1,17 +1,19 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def update_autostart(uuid, value)
           domain = client.lookup_domain_by_uuid(uuid)
           domain.autostart = value
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def update_autostart(uuid, value)
-          value
-        end
+        include Shared
       end
     end
   end

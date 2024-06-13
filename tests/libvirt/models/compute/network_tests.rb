@@ -1,7 +1,7 @@
 Shindo.tests('Fog::Compute[:libvirt] | network model', ['libvirt']) do
 
   networks = Fog::Compute[:libvirt].networks
-  network = networks.last
+  network = networks.first
 
   tests('The network model should') do
     tests('have the action') do
@@ -9,7 +9,7 @@ Shindo.tests('Fog::Compute[:libvirt] | network model', ['libvirt']) do
       test('dhcp_leases') { network.respond_to? 'dhcp_leases' }
     end
     tests('have a dhcp_leases action that') do
-      test('returns an array') { network.dhcp_leases('99:88:77:66:55:44', 0).kind_of? Array }
+      test('returns an array') { network.dhcp_leases('aa:bb:cc:dd:ee:ff', 0).kind_of? Array }
     end
     tests('have attributes') do
       model_attribute_hash = network.attributes

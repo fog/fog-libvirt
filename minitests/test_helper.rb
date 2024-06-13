@@ -14,5 +14,5 @@ require 'fog/libvirt'
 
 Fog.mock!
 Fog.credentials = {
-    :libvirt_uri => 'qemu://libvirt/system',
+    :libvirt_uri => 'test:///default',
 }.merge(Fog.credentials)

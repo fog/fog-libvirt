@@ -1,7 +1,7 @@
 module Fog
   module Libvirt
     class Compute
-      class Real
+      module Shared
         def get_node_info
           node_hash = Hash.new
           node_info = client.node_get_info
@@ -28,9 +28,12 @@ module Fog
         end
       end
 
+      class Real
+        include Shared
+      end
+
       class Mock
-        def get_node_info
-        end
+        include Shared
       end
     end
   end
