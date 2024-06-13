@@ -446,14 +446,11 @@ module Fog
         # Currently only one ip address is returned, but in the future this could be multiple
         # if the server has multiple network interface
         def addresses(service_arg=service, options={})
-          mac=self.mac
-
           ip_address = nil
-          nic = self.nics.find {|nic| nic.mac==mac}
-          if !nic.nil?
+          if (nic = self.nics&.first)
             net = service.networks.all(:name => nic.network).first
             # Assume the lease expiring last is the current IP address
-            ip_address = net&.dhcp_leases(mac)&.max_by { |lse| lse["expirytime"] }&.dig("ipaddr")
+            ip_address = net&.dhcp_leases(nic.mac)&.max_by { |lse| lse["expirytime"] }&.dig("ipaddr")
           end
 
           return { :public => [ip_address], :private => [ip_address] }
