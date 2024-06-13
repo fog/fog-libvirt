@@ -365,6 +365,7 @@ module Fog
 
                 nics.each do |nic|
                   xml.interface(:type => nic.type) do
+                    xml.mac(:address => nic.mac) if nic.mac
                     if nic.type == "bridge"
                       xml.source(:bridge => nic.bridge)
                     else
