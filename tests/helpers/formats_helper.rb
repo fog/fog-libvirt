@@ -7,6 +7,7 @@ require 'fog/schema/data_validator'
 # allows both nil.is_a?(Fog::Nullable::String) and ''.is_a?(Fog::Nullable::String)
 module Fog
   module Boolean; end
+
   module Nullable
     module Boolean; end
     module Integer; end
