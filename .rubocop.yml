@@ -3,14 +3,14 @@ inherit_from: .rubocop_todo.yml
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
-LineLength:
+Layout/LineLength:
   Max: 100
   Enabled: false
 
 Style/StringLiterals:
   Enabled: false
 
-SignalException:
+Style/SignalException:
   Description: 'Do not enforce use of fail when raising exceptions.'
   # Valid values are: semantic, only_raise and only_fail
   EnforcedStyle: only_raise
