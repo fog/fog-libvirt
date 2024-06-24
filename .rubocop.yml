@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
-HashSyntax:
+Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
 LineLength:

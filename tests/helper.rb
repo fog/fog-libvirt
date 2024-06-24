@@ -3,7 +3,7 @@ ENV['FOG_CREDENTIAL'] = ENV['FOG_CREDENTIAL'] || 'default'
 
 require 'fog/libvirt'
 
-Excon.defaults.merge!(debug_request: true, debug_response: true)
+Excon.defaults.merge!(:debug_request => true, :debug_response => true)
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'helpers', 'mock_helper'))
 

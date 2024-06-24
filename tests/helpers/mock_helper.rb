@@ -9,6 +9,6 @@ end
 # if in mocked mode, fill in some fake credentials for us
 if Fog.mock?
   Fog.credentials = {
-    libvirt_uri:                       'qemu://libvirt/system',
+    :libvirt_uri => 'qemu://libvirt/system',
   }.merge(Fog.credentials)
 end

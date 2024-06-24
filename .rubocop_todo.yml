@@ -630,18 +630,6 @@ Style/GuardClause:
     - 'lib/fog/libvirt/models/compute/util/uri.rb'
     - 'lib/fog/libvirt/requests/compute/dhcp_leases.rb'
 
-# Offense count: 37
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, UseHashRocketsWithSymbolValues, PreferHashRocketsForNonAlnumEndingSymbols.
-# SupportedStyles: ruby19, hash_rockets, no_mixed_keys, ruby19_no_mixed_keys
-Style/HashSyntax:
-  Exclude:
-    - 'bin/create_s390x_vm.rb'
-    - 'tests/helper.rb'
-    - 'tests/helpers/formats_helper.rb'
-    - 'tests/helpers/formats_helper_tests.rb'
-    - 'tests/helpers/mock_helper.rb'
-
 # Offense count: 8
 # Cop supports --auto-correct.
 Style/IfUnlessModifier:
