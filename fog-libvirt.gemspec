@@ -28,18 +28,18 @@ Gem::Specification.new do |s|
   s.add_dependency("fog-core", ">= 1.27.4")
   s.add_dependency("fog-json")
   s.add_dependency("fog-xml", "~> 0.1.1")
-  s.add_dependency('ruby-libvirt','>= 0.7.0')
   s.add_dependency("json")
+  s.add_dependency('ruby-libvirt','>= 0.7.0')
 
-  s.add_development_dependency("net-ssh")
   s.add_development_dependency("minitest", "~> 5.0")
+  s.add_development_dependency("mocha", ">= 1.15", "< 3")
+  s.add_development_dependency("net-ssh")
   s.add_development_dependency("pry")
   s.add_development_dependency("rake")
   s.add_development_dependency("rubocop")
   s.add_development_dependency("shindo", "~> 0.3.4")
   s.add_development_dependency("simplecov")
   s.add_development_dependency("yard")
-  s.add_development_dependency("mocha", ">= 1.15", "< 3")
 
   # Let's not ship dot files and gemfiles
   git_files = `git ls-files`.split("\n")
