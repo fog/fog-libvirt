@@ -10,10 +10,6 @@ LineLength:
 Style/StringLiterals:
   Enabled: false
 
-Encoding:
-  Description: 'Use UTF-8 as the source file encoding.'
-  Enabled: false
-
 SignalException:
   Description: 'Do not enforce use of fail when raising exceptions.'
   # Valid values are: semantic, only_raise and only_fail
