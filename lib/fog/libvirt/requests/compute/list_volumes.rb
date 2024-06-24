@@ -29,16 +29,16 @@ module Fog
           return nil if format_type == "dir"
 
           begin
-              {
-                :pool_name   => vol.pool.name,
-                :key         => vol.key,
-                :id          => vol.key,
-                :path        => vol.path,
-                :name        => vol.name,
-                :format_type => format_type,
-                :allocation  => bytes_to_gb(vol.info.allocation),
-                :capacity    => bytes_to_gb(vol.info.capacity),
-              }
+            {
+              :pool_name   => vol.pool.name,
+              :key         => vol.key,
+              :id          => vol.key,
+              :path        => vol.path,
+              :name        => vol.name,
+              :format_type => format_type,
+              :allocation  => bytes_to_gb(vol.info.allocation),
+              :capacity    => bytes_to_gb(vol.info.capacity),
+            }
           rescue ::Libvirt::RetrieveError, ::Libvirt::Error
             return nil # If there are issues during stat of volume file
           end

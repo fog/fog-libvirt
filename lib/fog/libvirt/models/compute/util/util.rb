@@ -12,8 +12,8 @@ module Fog
       end
 
       def xml_elements(xml, path, attribute=nil)
-         xml = Nokogiri::XML(xml)
-         attribute.nil? ? (xml/path).map : (xml/path).map{|element| element[attribute.to_sym]}
+        xml = Nokogiri::XML(xml)
+        attribute.nil? ? (xml/path).map : (xml/path).map{|element| element[attribute.to_sym]}
       end
 
       def to_xml template_name = nil
