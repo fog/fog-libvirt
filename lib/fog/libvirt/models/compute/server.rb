@@ -92,10 +92,11 @@ module Fog
 
         def destroy(options={ :destroy_volumes => false, :flags => ::Libvirt::Domain::UNDEFINE_NVRAM })
           poweroff unless stopped?
-          if options.fetch(:flags, ::Libvirt::Domain::UNDEFINE_NVRAM).zero?
+          flags = options.fetch(:flags, ::Libvirt::Domain::UNDEFINE_NVRAM)
+          if flags.zero?
             service.vm_action(uuid, :undefine)
           else
-            service.vm_action(uuid, :undefine, options[:flags])
+            service.vm_action(uuid, :undefine, flags)
           end
           volumes.each { |vol| vol.destroy } if options[:destroy_volumes]
           true
