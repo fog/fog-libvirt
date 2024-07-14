@@ -30,6 +30,7 @@ module Fog
         attribute :cpu
         attribute :hugepages
         attribute :guest_agent
+        attribute :video
         attribute :virtio_rng
 
         attribute :state
@@ -412,7 +413,7 @@ module Fog
                   graphics.passwd = display[:password] unless display[:password].empty?
 
                   xml.video do
-                    xml.model(:type => "cirrus", :vram => 9216, :heads => 1)
+                    xml.model(video)
                   end
                 end
               end
@@ -665,6 +666,7 @@ module Fog
             :cpu                    => {},
             :hugepages              => false,
             :guest_agent            => true,
+            :video                  => {:type => "cirrus", :vram => 9216, :heads => 1},
             :virtio_rng             => {},
           }
         end
