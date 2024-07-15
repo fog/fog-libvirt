@@ -92,26 +92,14 @@ module Fog
 
               xml.target do
                 xml.format(:type => format_type)
-
-                xml.permissions do
-                  xml.owner(owner) if owner
-                  xml.group(group) if group
-                  xml.mode('0744')
-                  xml.label('virt_image_t')
-                end
+                xml_permissions(xml)
               end
 
               if backing_volume
                 xml.backingStore do
                   xml.path(backing_volume.path)
                   xml.format(:type => backing_volume.format_type)
-
-                  xml.permissions do
-                    xml.owner(owner) if owner
-                    xml.group(group) if group
-                    xml.mode('0744')
-                    xml.label('virt_image_t')
-                  end
+                  xml_permissions(xml)
                 end
               end
             end
@@ -121,6 +109,15 @@ module Fog
         end
 
         private
+
+        def xml_permissions(xml)
+          xml.permissions do
+            xml.owner(owner) if owner
+            xml.group(group) if group
+            xml.mode('0744')
+            xml.label('virt_image_t')
+          end
+        end
 
         def image_suffix
           return "img" if format_type == "raw"
