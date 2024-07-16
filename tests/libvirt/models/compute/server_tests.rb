@@ -13,7 +13,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       %w{ start stop destroy reboot suspend }.each do |action|
         test(action) { server.respond_to? action }
       end
-      %w{ start reboot suspend stop destroy}.each do |action|
+      %w{ start reboot suspend stop }.each do |action|
         test("#{action} returns successfully") {
           begin
             server.send(action.to_sym)
@@ -60,6 +60,11 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         end
       end
     end
+
+    test('can destroy') do
+      servers.create(:name => Fog::Mock.random_letters(8)).destroy
+    end
+
     test('be a kind of Fog::Libvirt::Compute::Server') { server.kind_of? Fog::Libvirt::Compute::Server }
     tests("serializes to xml") do
       test("with memory") { server.to_xml.match?(%r{<memory>\d+</memory>}) }

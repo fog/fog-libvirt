@@ -97,6 +97,10 @@ module Fog
           if flags.zero?
             service.vm_action(uuid, :undefine)
           else
+            # the test driver doesn't support UNDEFINE_NVRAM
+            if service.uri.driver == 'test'
+              flags ^= ::Libvirt::Domain::UNDEFINE_NVRAM
+            end
             service.vm_action(uuid, :undefine, flags)
           end
           volumes.each { |vol| vol.destroy } if options[:destroy_volumes]
