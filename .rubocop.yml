@@ -17,3 +17,7 @@ Style/SignalException:
 
 Metrics/ClassLength:
   Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - tests/**/*.rb
