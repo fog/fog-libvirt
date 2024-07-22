@@ -13,8 +13,8 @@ module Fog
 
         attribute :cpus
         attribute :cputime
-        attribute :os_firmware
-        attribute :os_firmware_features
+        attribute :firmware
+        attribute :firmware_features
         attribute :os_type
         attribute :memory_size
         attribute :max_memory_size
@@ -291,8 +291,7 @@ module Fog
               xml.vcpu(cpus)
               os_tags = {}
 
-              # Set firmware only if it's EFI, BIOS don't need to be set
-              os_tags[:firmware] = "efi" if os_firmware == "efi"
+              os_tags[:firmware] = firmware
 
               xml.os(**os_tags) do
                 type = xml.type(os_type, :arch => arch)
@@ -302,9 +301,9 @@ module Fog
                   xml.boot(:dev => dev)
                 end
 
-                if os_firmware == "efi"
+                if firmware == "efi" && firmware_features&.any?
                   xml.firmware do
-                    os_firmware_features.each_pair do |key, value|
+                    firmware_features.each_pair do |key, value|
                       xml.feature(:name => key, :enabled => value)
                     end
                   end
