@@ -13,8 +13,10 @@ module Fog
 
         attribute :cpus
         attribute :cputime
-        attribute :os_firmware
-        attribute :os_firmware_features
+        attribute :firmware
+        attribute :firmware_features
+        attribute :secure_boot
+        attribute :loader_attributes
         attribute :os_type
         attribute :memory_size
         attribute :max_memory_size
@@ -291,8 +293,7 @@ module Fog
               xml.vcpu(cpus)
               os_tags = {}
 
-              # Set firmware only if it's EFI, BIOS don't need to be set
-              os_tags[:firmware] = "efi" if os_firmware == "efi"
+              os_tags[:firmware] = firmware if firmware == 'efi'
 
               xml.os(**os_tags) do
                 type = xml.type(os_type, :arch => arch)
@@ -302,9 +303,13 @@ module Fog
                   xml.boot(:dev => dev)
                 end
 
-                if os_firmware == "efi"
+                loader_attributes&.each do |key, value|
+                  xml.loader(key => value)
+                end
+
+                if firmware == "efi" && firmware_features&.any?
                   xml.firmware do
-                    os_firmware_features.each_pair do |key, value|
+                    firmware_features.each_pair do |key, value|
                       xml.feature(:name => key, :enabled => value)
                     end
                   end
@@ -555,6 +560,7 @@ module Fog
             :guest_agent            => true,
             :video                  => {:type => "cirrus", :vram => 9216, :heads => 1},
             :virtio_rng             => {},
+            :firmware_features      => { "secure-boot" => "no" },
           }
         end
 

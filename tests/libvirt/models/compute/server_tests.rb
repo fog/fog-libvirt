@@ -32,8 +32,10 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       attributes = [ :id,
         :cpus,
         :cputime,
-        :os_firmware,
-        :os_firmware_features,
+        :firmware,
+        :firmware_features,
+        :secure_boot,
+        :loader_attributes,
         :os_type,
         :memory_size,
         :max_memory_size,
@@ -92,11 +94,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
     test("with efi firmware") do
       server = Fog::Libvirt::Compute::Server.new(
         {
-          :os_firmware => "efi",
-          :os_firmware_features => {
-            "secure-boot" => "no",
-            "enrolled-keys" => "no"
-          },
+          :firmware => "efi",
           :nics => [],
           :volumes => []
         }
@@ -104,19 +102,20 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       xml = server.to_xml
 
       os_firmware = xml.include?('<os firmware="efi">')
-      secure_boot = !xml.include?('<feature name="secure-boot" enabled="no" />')
-      enrolled_keys = !xml.include?('<feature name="enrolled-keys" enabled="no" />')
+      secure_boot = xml.include?('<feature name="secure-boot" enabled="no"/>')
+      loader_attributes = !xml.include?('<loader secure="yes"/>')
 
-      os_firmware && secure_boot && enrolled_keys
+      os_firmware && secure_boot && loader_attributes
     end
-    test("with secure boot") do
+    test("with secure boot enabled") do
       server = Fog::Libvirt::Compute::Server.new(
         {
-          :os_firmware => "efi",
-          :os_firmware_features => {
+          :firmware => "efi",
+          :firmware_features => {
             "secure-boot" => "yes",
             "enrolled-keys" => "yes"
           },
+          :loader_attributes => { "secure" => "yes" },
           :nics => [],
           :volumes => []
         }
@@ -126,8 +125,9 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       os_firmware = xml.include?('<os firmware="efi">')
       secure_boot = xml.include?('<feature name="secure-boot" enabled="yes"/>')
       enrolled_keys = xml.include?('<feature name="enrolled-keys" enabled="yes"/>')
+      loader_attributes = xml.include?('<loader secure="yes"/>')
 
-      os_firmware && secure_boot && enrolled_keys
+      os_firmware && secure_boot && enrolled_keys && loader_attributes
     end
   end
 end
