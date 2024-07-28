@@ -46,6 +46,17 @@ module Fog
           xml_elements(xml, "domain/os/boot", "dev")
         end
 
+        def firmware(xml)
+          xml_elements(xml, "domain/os", "firmware").first || 'bios'
+        end
+
+        def firmware_features(xml)
+          features = xml_elements(xml, "domain/os/firmware/feature").map do |feature|
+            [feature[:name], feature[:enabled]]
+          end
+          features.to_h
+        end
+
         def domain_interfaces xml
           ifs = xml_elements(xml, "domain/devices/interface")
           ifs.map { |i|
@@ -76,9 +87,11 @@ module Fog
               :active          => dom.active?,
               :display         => domain_display(dom.xml_desc),
               :boot_order      => boot_order(dom.xml_desc),
+              :firmware        => firmware(dom.xml_desc),
               :nics            => domain_interfaces(dom.xml_desc),
               :volumes_path    => domain_volumes(dom.xml_desc),
-              :state           => states[dom.info.state]
+              :state           => states[dom.info.state],
+              :firmware_features => firmware_features(dom.xml_desc)
             }
           rescue ::Libvirt::RetrieveError, ::Libvirt::Error
             # Catch libvirt exceptions to avoid race conditions involving

@@ -13,6 +13,8 @@ module Fog
 
         attribute :cpus
         attribute :cputime
+        attribute :firmware
+        attribute :firmware_features
         attribute :os_type
         attribute :memory_size
         attribute :max_memory_size
@@ -287,14 +289,27 @@ module Fog
               end
 
               xml.vcpu(cpus)
-              xml.os do
+              os_tags = {}
+
+              os_tags[:firmware] = firmware
+
+              xml.os(**os_tags) do
                 type = xml.type(os_type, :arch => arch)
                 type[:machine] = "q35" if ["i686", "x86_64"].include?(arch)
 
                 boot_order.each do |dev|
                   xml.boot(:dev => dev)
                 end
+
+                if firmware == "efi" && firmware_features&.any?
+                  xml.firmware do
+                    firmware_features.each_pair do |key, value|
+                      xml.feature(:name => key, :enabled => value)
+                    end
+                  end
+                end
               end
+
               xml.features do
                 xml.acpi
                 xml.apic
