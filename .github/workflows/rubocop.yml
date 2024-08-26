@@ -9,7 +9,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.0
+          ruby-version: 3.3
       - name: rubocop
         uses: reviewdog/action-rubocop@v2
         with:
