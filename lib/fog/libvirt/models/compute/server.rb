@@ -307,7 +307,7 @@ module Fog
                   end
                 else
                   xml.cpu(
-                    :mode => cpu.dig(:model, :name) || "host-passthrough",
+                    :mode => cpu.fetch(:mode, "host-passthrough"),
                     :check => cpu.fetch(:check, "none"),
                     :migratable => cpu.fetch(:migratable, "on")
                   )
