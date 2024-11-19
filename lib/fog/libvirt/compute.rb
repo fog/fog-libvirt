@@ -117,6 +117,12 @@ module Fog
 
       class Mock
         include Shared
+
+        def enhance_uri(uri)
+          uri = 'test:///default' unless ::URI.parse(uri).scheme == 'test'
+
+          super(uri)
+        end
       end
     end
   end
