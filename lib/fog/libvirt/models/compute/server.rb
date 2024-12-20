@@ -363,7 +363,7 @@ module Fog
                         end
                       end
 
-                      xml.target(:dev => target_device, :bus => args["bus_type"] == "virtio" ? "virtio" : "scsi")
+                      xml.target(:dev => target_device, :bus => ceph_args["bus_type"] == "virtio" ? "virtio" : "scsi")
                     end
                   else
                     is_block = volume.path.start_with?("/dev/")
