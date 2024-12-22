@@ -1,5 +1,4 @@
 require 'nokogiri'
-require 'erb'
 require 'securerandom'
 
 module Fog
