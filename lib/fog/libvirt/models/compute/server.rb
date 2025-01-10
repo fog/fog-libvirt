@@ -470,8 +470,8 @@ module Fog
             end
           end
 
-          if args.has_key?("libvirt_ceph_pool")
-            args.has_key?("libvirt_ceph_pools") ? args["libvirt_ceph_pools"] << args["libvirt_ceph_pool"] : args["libvirt_ceph_pools"] = [args["libvirt_ceph_pool"]]
+          if args.has_key?("libvirt_ceph_pool") && !args.has_key?("libvirt_ceph_pools")
+            args["libvirt_ceph_pools"] = [args["libvirt_ceph_pool"]]
             args.delete("libvirt_ceph_pool")
           end
 
