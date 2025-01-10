@@ -1,11 +1,7 @@
 RealFile = File
 class FakeFile < RealFile
   def self.file?(path)
-    if path == '/etc/foreman/ceph.conf'
-      return true
-    else
-      return RealFile.file(path)
-    end
+    path == '/etc/foreman/ceph.conf' || RealFile.file(path)
   end
 
   def self.readlines(path)
@@ -14,6 +10,7 @@ class FakeFile < RealFile
         "monitor=mon001.example.com,mon002.example.com,mon003.example.com",
         "port=6789",
         "libvirt_ceph_pools=rbd_pool_name,second_rbd_pool_name",
+        "libvirt_ceph_pool=third_rbd_pool_name",
         "auth_username=libvirt",
         "auth_uuid=uuid_of_libvirt_secret",
         "bus_type=virtio"
@@ -134,7 +131,8 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
           {
             :nics => [],
             :volumes => [
-              Fog::Libvirt::Compute::Volume.new({ :path => "rbd_pool_name/block-1", :pool_name => "rbd_pool_name" })
+              Fog::Libvirt::Compute::Volume.new({ :path => "rbd_pool_name/block-1", :pool_name => "rbd_pool_name" }),
+              Fog::Libvirt::Compute::Volume.new({ :path => "third_rbd_pool_name/block-2", :pool_name => "third_rbd_pool_name" })
             ]
           }
         )
@@ -143,11 +141,12 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
 
         network_disk = xml.match?(/<disk type="network" device="disk">/)
         mon_host = xml.match?(%r{<host name="mon001.example.com" port="6789"/>})
-        source_rbd = xml.match?(%r{<source protocol="rbd" name="rbd_pool_name/block-1">})
+        source_block1_rbd = xml.match?(%r{<source protocol="rbd" name="rbd_pool_name/block-1">})
+        source_block2_rbd = xml.match?(%r{<source protocol="rbd" name="third_rbd_pool_name/block-2">})
         auth_username = xml.match?(/<auth username="libvirt">/)
         auth_secret = xml.match?(%r{<secret type="ceph" uuid="uuid_of_libvirt_secret"/>})
 
-        network_disk && mon_host && source_rbd && auth_username && auth_secret
+        network_disk && mon_host && source_block1_rbd && source_block2_rbd && auth_username && auth_secret
       end
       test("with q35 machine type on x86_64") { server.to_xml.match?(%r{<type arch="x86_64" machine="q35">hvm</type>}) }
     end

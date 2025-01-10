@@ -458,7 +458,7 @@ module Fog
 
           args = {}
 
-          valid_keys = ["monitor", "port", "libvirt_ceph_pools", "auth_username", "auth_uuid", "bus_type"]
+          valid_keys = ["monitor", "port", "libvirt_ceph_pools", "libvirt_ceph_pool", "auth_username", "auth_uuid", "bus_type"]
           array_values = ["monitor", "libvirt_ceph_pools"]
 
           File.readlines(path).each do |line|
@@ -470,7 +470,10 @@ module Fog
             end
           end
 
-          puts args
+          if args.has_key?("libvirt_ceph_pool")
+            args.has_key?("libvirt_ceph_pools") ? args["libvirt_ceph_pools"] << args["libvirt_ceph_pool"] : args["libvirt_ceph_pools"] = [args["libvirt_ceph_pool"]]
+            args.delete("libvirt_ceph_pool")
+          end
 
           args
         end
