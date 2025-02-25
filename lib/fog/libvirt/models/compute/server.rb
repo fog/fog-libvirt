@@ -558,7 +558,7 @@ module Fog
             :cpu                    => {},
             :hugepages              => false,
             :guest_agent            => true,
-            :video                  => {:type => "cirrus", :vram => 9216, :heads => 1},
+            :video                  => {:type => "vga", :heads => 1},
             :virtio_rng             => {},
             :firmware_features      => { "secure-boot" => "no" },
           }
