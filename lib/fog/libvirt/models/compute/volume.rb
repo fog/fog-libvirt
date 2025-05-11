@@ -91,7 +91,7 @@ module Fog
               xml.capacity(capacity_size, :unit => capacity_unit)
 
               xml.target do
-                xml.format(:type => format_type)
+                xml.format(:type => format_type) if format_type
                 xml_permissions(xml)
               end
 

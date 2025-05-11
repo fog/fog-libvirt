@@ -368,7 +368,9 @@ module Fog
                   else
                     is_block = volume.path.start_with?("/dev/")
                     xml.disk(:type => is_block ? "block" : "file", :device => "disk") do
-                      xml.driver(:name => "qemu", :type => volume.format_type)
+                      driver = xml.driver(:name => "qemu")
+                      driver[:type] = volume.format_type if volume.format_type
+
                       if is_block
                         xml.source(:dev => volume.path)
                       else
