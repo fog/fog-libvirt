@@ -129,5 +129,39 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
 
       os_firmware && secure_boot && enrolled_keys && loader_attributes
     end
+
+    test("with volumes") do
+      pool = Fog::Compute[:libvirt].pools.create(
+        :persistent => true,
+        :xml => <<~XML
+          <pool type='logical'>
+            <name>lvm-pool</name>
+            <source>
+              <name>vg_storage01</name>
+              <format type='lvm2'/>
+            </source>
+            <target>
+              <path>/dev/vg_storage01</path>
+            </target>
+          </pool>
+        XML
+      )
+      server = Fog::Compute[:libvirt].servers.new(
+        :nics => [],
+        :volumes => [
+          {
+            :path => "/dev/vg_storage01/volume01",
+            :pool_name => pool.name
+          }
+        ]
+      )
+      server.volumes.each do |volume|
+        volume.save
+        # mock driver doesn't simulate the real thing
+        # LVM doesn't have a volume type
+        volume.format_type = nil
+      end
+      !server.save.nil?
+    end
   end
 end
