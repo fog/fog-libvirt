@@ -53,6 +53,15 @@ module Fog
           service.volume_action key, :wipe
         end
 
+        def reload
+          super
+
+          # Restore lost defaults
+          self.format_type ||= defaults[:format_type]
+
+          self
+        end
+
         # Clones this volume to the name provided
         def clone(name)
           new_volume      = self.dup
