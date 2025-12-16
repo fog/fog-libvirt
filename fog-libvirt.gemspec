@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency('ruby-libvirt','>= 0.7.0')
 
   s.add_development_dependency("minitest", "~> 5.0")
-  s.add_development_dependency("mocha", ">= 1.15", "< 3")
+  s.add_development_dependency("mocha", ">= 1.15", "< 4")
   s.add_development_dependency("net-ssh")
   s.add_development_dependency("pry")
   s.add_development_dependency("rake")
