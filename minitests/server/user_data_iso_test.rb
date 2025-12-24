@@ -26,7 +26,7 @@ class UserDataIsoTest < Minitest::Test
 
   def test_iso_is_generated
     in_a_temp_dir do |d|
-      @server.expects(:system).with(regexp_matches(/^genisoimage/)).returns(true)
+      @server.expects(:system).with { |command, *_args| command == 'xorrisofs' }.returns(true)
       @server.generate_config_iso_in_dir(d, @test_data) {|iso| }
     end
   end
