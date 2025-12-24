@@ -260,7 +260,7 @@ module Fog
           File.write(user_data_path, user_data)
 
           isofile = Tempfile.new(['init', '.iso']).path
-          unless system("xorrisofs -output #{isofile} -volid cidata -joliet -rock #{user_data_path} #{meta_data_path}")
+          unless system('xorrisofs', '-output', isofile, '-volid', 'cidata', '-joliet', '-rock', user_data_path, meta_data_path)
             raise Fog::Errors::Error.new("Couldn't generate cloud-init iso disk with xorrisofs.")
           end
           blk.call(isofile)
