@@ -14,13 +14,13 @@ module Fog
         attribute :spapr_address_type
         attribute :spapr_address_reg
 
-        # Models   
+        # Models
         #   crb - TCG PC Client Platform TPM Profile (PTP) Specification (2017)
         #   tis - TCG PC Client Specific TPM Interface Specification (TIS) (2013)
         #   spapr - Used with pSeries (ppc64)
         #   spapr-tpm-proxy - Used with pSeries (ppc64), this is only used with 'passthrough' type
         #
-        MODELS = ['crb','tis','spapr','spapr-tpm-proxy']
+        MODELS = ['crb', 'tis', 'spapr', 'spapr-tpm-proxy']
 
         # Versions
         #
@@ -28,7 +28,7 @@ module Fog
 
         # Types
         #
-        TYPES = ['emulator','passthrough']
+        TYPES = ['emulator', 'passthrough']
 
         def initialize(attributes={})
           super defaults.merge(attributes)
