@@ -32,7 +32,7 @@ module Fog
 
         def initialize(attributes={})
           super defaults.merge(attributes)
-          raise Fog::Errors::Error.new("#{model} is not a supported tpm model") if new? && !MODELS.include?(model) 
+          raise Fog::Errors::Error.new("#{model} is not a supported tpm model") if new? && !MODELS.include?(model)
           raise Fog::Errors::Error.new("#{type} is not a supported tpm type") if new? && !TYPES.include?(type)
         end
 
