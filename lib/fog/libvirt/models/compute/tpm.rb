@@ -20,15 +20,15 @@ module Fog
         #   spapr - Used with pSeries (ppc64)
         #   spapr-tpm-proxy - Used with pSeries (ppc64), this is only used with 'passthrough' type
         #
-        MODELS = ['crb', 'tis', 'spapr', 'spapr-tpm-proxy']
+        MODELS = ['crb', 'tis', 'spapr', 'spapr-tpm-proxy'].freeze
 
         # Versions
         #
-        VERSIONS = ['1.2', '2.0']
+        VERSIONS = ['1.2', '2.0'].freeze
 
         # Types
         #
-        TYPES = ['emulator', 'passthrough']
+        TYPES = ['emulator', 'passthrough'].freeze
 
         def initialize(attributes={})
           super defaults.merge(attributes)
