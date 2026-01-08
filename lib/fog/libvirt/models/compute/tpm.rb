@@ -70,7 +70,8 @@ module Fog
           when "x86_64"
             { :model => "crb", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
           when "ppc64"
-            { :model => "spapr",
+            { 
+              :model => "spapr",
               :type => "emulator",
               :version => "2.0",
               :passthrough_device_path => "/dev/tpmrm0",
@@ -78,7 +79,7 @@ module Fog
               :spapr_address_reg => "0x00004000"
             }
           when "arm64" || "aarch64"
-            { :model => "tis", :type => "emulator", :version => "2.0",:passthrough_device_path => "/dev/tpm0" }
+            { :model => "tis", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
           else
             { }
           end
