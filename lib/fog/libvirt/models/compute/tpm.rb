@@ -25,7 +25,6 @@ module Fog
         MODELS_PPC64 = ['spapr', 'spapr-tpm-proxy'].freeze
         MODELS_ARM64 = ['tis'].freeze
 
-
         # Versions
         #
         VERSIONS = ['1.2', '2.0'].freeze
@@ -54,11 +53,12 @@ module Fog
         end
 
         def supported_models
-          if @arch == "x86_64"
+          if @arch
+          when "x86_64"
             MODELS_X86_64
-          elsif @arch == "ppc64"
+          when "ppc64"
             MODELS_PPC64
-          elsif @arch == "arm64" || arch == "aarch64"
+          when "arm64" || arch == "aarch64"
             MODELS_ARM64
           else
             raise Fog::Errors::Error.new('CPU Architecture does not have any supported TPM models!')
@@ -66,19 +66,19 @@ module Fog
         end
 
         def defaults
-          if @arch == "x86_64"
-            {:model => "crb", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0"}
-          elsif @arch == "ppc64"
-            {:model => "spapr", :type => "emulator",:version => "2.0", :passthrough_device_path => "/dev/tpmrm0",
-              :spapr_address_type => "spapr-vio", :spapr_address_reg => "0x00004000"}
-          elsif @arch == "arm64" || @arch == "aarch64"
-            {:model => "tis", :type => "emulator", :version => "2.0",:passthrough_device_path => "/dev/tpm0"}
+          if @arch
+          when "x86_64"
+            { :model => "crb", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
+          when "ppc64"
+            { :model => "spapr", :type => "emulator",:version => "2.0", :passthrough_device_path => "/dev/tpmrm0",
+            :spapr_address_type => "spapr-vio", :spapr_address_reg => "0x00004000" }
+          when "arm64" || "aarch64"
+            { :model => "tis", :type => "emulator", :version => "2.0",:passthrough_device_path => "/dev/tpm0" }
           else
-             raise Fog::Errors::Error.new('CPU Architecture does not have any TPM default values!')
-          end          
+            { }
+          end
         end
       end
     end
   end
 end
-
