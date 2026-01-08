@@ -54,12 +54,12 @@ module Fog
 
         def supported_models
           if @arch
-          when "x86_64"
+          when "x86_64" then
             MODELS_X86_64
           when "ppc64"
-            MODELS_PPC64
+            MODELS_PPC64 then
           when "arm64" || arch == "aarch64"
-            MODELS_ARM64
+            MODELS_ARM64 then
           else
             raise Fog::Errors::Error.new('CPU Architecture does not have any supported TPM models!')
           end
@@ -67,12 +67,12 @@ module Fog
 
         def defaults
           if @arch
-          when "x86_64"
+          when "x86_64" then
             { :model => "crb", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
-          when "ppc64"
+          when "ppc64" then
             { :model => "spapr", :type => "emulator",:version => "2.0", :passthrough_device_path => "/dev/tpmrm0",
             :spapr_address_type => "spapr-vio", :spapr_address_reg => "0x00004000" }
-          when "arm64" || "aarch64"
+          when "arm64" || "aarch64" then
             { :model => "tis", :type => "emulator", :version => "2.0",:passthrough_device_path => "/dev/tpm0" }
           else
             { }
