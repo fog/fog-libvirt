@@ -53,11 +53,11 @@ module Fog
         end
 
         def supported_models
-          if @arch
+          case @arch
           when "x86_64" then
             MODELS_X86_64
-          when "ppc64"
-            MODELS_PPC64 then
+          when "ppc64" then
+            MODELS_PPC64
           when "arm64" || arch == "aarch64"
             MODELS_ARM64 then
           else
@@ -66,7 +66,7 @@ module Fog
         end
 
         def defaults
-          if @arch
+          case @arch
           when "x86_64" then
             { :model => "crb", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
           when "ppc64" then
