@@ -429,7 +429,7 @@ module Fog
                     else
                       xml.backend(:type => tpm_device.type, :version => tpm_device.version)
                     end
-                    if tpm_device.model == "spapr" ||  tpm_device.model == "spapr-tpm-proxy"
+                    if tpm_device.model == "spapr" || tpm_device.model == "spapr-tpm-proxy"
                       xml.address(:type => tpm_device.par_address_type, :reg => tpm_device.spar_address_reg)
                     end
                   end
