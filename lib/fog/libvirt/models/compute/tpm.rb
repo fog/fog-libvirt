@@ -55,11 +55,11 @@ module Fog
 
         def supported_models
           if @arch == "x86_64"
-             MODELS_X86_64
+            MODELS_X86_64
           elsif @arch == "ppc64"
-             MODELS_PPC64
+            MODELS_PPC64
           elsif @arch == "arm64" || arch == "aarch64"
-             MODELS_ARM64
+            MODELS_ARM64
           else
             raise Fog::Errors::Error.new('CPU Architecture does not have any supported TPM models!')
           end
