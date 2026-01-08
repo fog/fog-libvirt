@@ -419,40 +419,6 @@ module Fog
                     tpm_model_type = "spapr-tpm-proxy"
                   else
                     tpm_model_type = "tpm-#{tpm_device.model}"
-
-        def destroy
-          raise Fog::Errors::Error.new('Destroying a TPM device is not yet implemented. Contributions welcome!')
-        end
-
-        def supported_models
-          if @arch == "x86_64"
-            MODELS_X86_64
-          elsif @arch == "ppc64"
-            MODELS_PPC64
-          elsif @arch == "arm64" || arch == "aarch64"
-            MODELS_ARM64
-          else
-            raise Fog::Errors::Error.new('CPU Architecture does not have any supported TPM models!')
-          end
-        end
-
-        def defaults
-          if @arch == "x86_64"
-            {:model => "crb", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0"}
-          elsif @arch == "ppc64"
-            {:model => "spapr", :type => "emulator",:version => "2.0", :passthrough_device_path => "/dev/tpmrm0",
-              :spapr_address_type => "spapr-vio", :spapr_address_reg => "0x00004000"}
-          elsif @arch == "arm64" || @arch == "aarch64"
-            {:model => "tis", :type => "emulator", :version => "2.0",:passthrough_device_path => "/dev/tpm0"}
-          else
-             raise Fog::Errors::Error.new('CPU Architecture does not have any TPM default values!')
-          end          
-        end
-      end
-    end
-  end
-end
-
                   end
 
                   xml.tpm(:model => tpm_model_type) do
