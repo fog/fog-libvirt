@@ -7,6 +7,7 @@ module Fog
         # Currently Qemu only allows for one TPM device
 
         identity  :id
+        attribute :arch
         attribute :model
         attribute :type
         attribute :version
@@ -20,7 +21,10 @@ module Fog
         #   spapr - Used with pSeries (ppc64)
         #   spapr-tpm-proxy - Used with pSeries (ppc64), this is only used with 'passthrough' type
         #
-        MODELS = ['crb', 'tis', 'spapr', 'spapr-tpm-proxy'].freeze
+        MODELS_X86_64 = ['crb', 'tis'].freeze
+        MODELS_PPC64 = ['spapr', 'spapr-tpm-proxy'].freeze
+        MODELS_ARM64 = ['tis'].freeze
+
 
         # Versions
         #
@@ -30,9 +34,10 @@ module Fog
         #
         TYPES = ['emulator', 'passthrough'].freeze
 
-        def initialize(attributes={})
+        def initialize(attributes = {}, arch = "")
+          @arch = arch
           super defaults.merge(attributes)
-          raise Fog::Errors::Error.new("#{model} is not a supported tpm model") if new? && !MODELS.include?(model)
+          raise Fog::Errors::Error.new("#{model} is not a supported tpm model") if new? && !supported_models.include?(model)
           raise Fog::Errors::Error.new("#{type} is not a supported tpm type") if new? && !TYPES.include?(type)
         end
 
@@ -41,24 +46,55 @@ module Fog
         end
 
         def save
-          raise Fog::Errors::Error.new('Creating a new tpm device is not yet implemented. Contributions welcome!')
+          raise Fog::Errors::Error.new('Creating a new TPM device is not yet implemented. Contributions welcome!')
         end
 
         def destroy
-          raise Fog::Errors::Error.new('Destroying a tpm device is not yet implemented. Contributions welcome!')
+          raise Fog::Errors::Error.new('Destroying a TPM device is not yet implemented. Contributions welcome!')
+        end
+
+        def supported_models
+          if @arch == "x86_64"
+            return MODELS_X86_64
+          elsif @arch == "ppc64"
+            return MODELS_PPC64
+          elsif @arch == "arm64" || arch == "aarch64"
+            return MODELS_ARM64
+          else
+            raise Fog::Errors::Error.new('CPU Architecture does not have any supported TPM models!')
+          end
         end
 
         def defaults
-          {
-            :model => "crb",
-            :type => "emulator",
-            :version => "2.0",
-            :device_path => "/dev/tpm0",
-            :spapr_address_type => "spapr-vio",
-            :spapr_address_reg => "0x00004000"
-          }
+          if @arch == "x86_64"
+            {
+              :model => "crb",
+              :type => "emulator",
+              :version => "2.0",
+              :passthrough_device_path => "/dev/tpm0"
+            }
+          elsif @arch == "ppc64"
+            {
+              :model => "spapr",
+              :type => "emulator",
+              :version => "2.0",
+              :passthrough_device_path => "/dev/tpmrm0",
+              :spapr_address_type => "spapr-vio",
+              :spapr_address_reg => "0x00004000"
+            }
+          elsif @arch == "arm64" || @arch == "aarch64"
+            {
+              :model => "tis",
+              :type => "emulator",
+              :version => "2.0",
+              :passthrough_device_path => "/dev/tpm0"
+            }
+          else
+             raise Fog::Errors::Error.new('CPU Architecture does not have any TPM default values!')
+          end          
         end
       end
     end
   end
 end
+
