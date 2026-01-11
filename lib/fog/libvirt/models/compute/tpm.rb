@@ -28,6 +28,7 @@ module Fog
         MODELS_X86_64 = ['crb', 'tis'].freeze
         MODELS_PPC64 = ['spapr', 'spapr-tpm-proxy'].freeze
         MODELS_ARM64 = ['tis'].freeze
+        MODELS_S390X = ['tis'].freeze
 
         # Versions
         #
@@ -60,6 +61,8 @@ module Fog
             MODELS_PPC64
           when "arm" || "aarch64"
             MODELS_ARM64
+          when "s390x"
+            MODELS_S390X
           else
             raise Fog::Errors::Error.new('CPU Architecture does not have any supported TPM models!')
           end
@@ -79,6 +82,8 @@ module Fog
               :spapr_address_reg => "0x00004000"
             }
           when "arm" || "aarch64"
+            { :model => "tis", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
+          when "s390x"
             { :model => "tis", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
           else
             {}
