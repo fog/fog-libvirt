@@ -35,6 +35,7 @@ module Fog
         VERSIONS = ['1.2', '2.0'].freeze
 
         def initialize(arch = "", attributes = {})
+          @id = "tpm0"
           @arch = arch
           super defaults.merge(attributes)
           raise Fog::Errors::Error, "#{type} is not a supported TPM type" if new? && !TYPES.include?(type)
