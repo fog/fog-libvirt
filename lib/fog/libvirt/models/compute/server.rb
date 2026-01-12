@@ -524,7 +524,12 @@ module Fog
         end
 
         def initialize_tpm
-          if tpm[:enable]
+          # tpm can be a boolean or hash
+          if tpm
+            # convert tpm to empty hash not hash value
+            if !tpm.is_a?(Hash)
+              tpm = {}
+            end
             self.tpm_device = TPM.new(arch, tpm)
           end
         end
@@ -586,7 +591,7 @@ module Fog
             :video                  => {:type => "virtio", :heads => 1},
             :virtio_rng             => {},
             :firmware_features      => { "secure-boot" => "no" },
-            :tpm                    => {:enable => false}
+            :tpm                    => false
           }
         end
 
