@@ -415,12 +415,8 @@ module Fog
                 end
 
                 if tpm[:enable]
-                  if tpm_device.model == "spapr-tpm-proxy"
-                    tpm_model_type = "spapr-tpm-proxy"
-                  else
-                    tpm_model_type = "tpm-#{tpm_device.model}"
-                  end
-
+                  tpm_model_type = (tpm_device.model == "spapr-tpm-proxy") ? "spapr-tpm-proxy" : "tpm-#{tpm_device.model}"
+                  
                   xml.tpm(:model => tpm_model_type) do
                     if tpm_device.type == "passthrough"
                       xml.backend(:type => tpm_device.type) do
@@ -530,7 +526,7 @@ module Fog
 
         def initialize_tpm
           if tpm[:enable]
-            self.tpm_device = TPM.new(tpm, arch)
+            self.tpm_device = TPM.new(arch, tpm)
           end
         end
 
