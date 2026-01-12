@@ -50,7 +50,7 @@ module Fog
         end
 
         def destroy
-          raise Fog::Errors::Error. 'Destroying a TPM device is not yet implemented. Contributions welcome!'
+          raise Fog::Errors::Error, 'Destroying a TPM device is not yet implemented. Contributions welcome!'
         end
 
         def supported_models
@@ -64,7 +64,7 @@ module Fog
           when "s390x"
             MODELS_S390X
           else
-            raise Fog::Errors::Error 'CPU Architecture does not have any supported TPM models!'
+            raise Fog::Errors::Error, 'CPU Architecture does not have any supported TPM models!'
           end
         end
 
