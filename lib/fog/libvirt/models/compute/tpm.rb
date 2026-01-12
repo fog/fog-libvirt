@@ -60,7 +60,7 @@ module Fog
             MODELS_X86_64
           when "ppc64" || "ppc64le"
             MODELS_PPC64
-          when "arm" || "aarch64"
+          when "arm" || "aarch64" || "aarch64_be"
             MODELS_ARM64
           when "s390x"
             MODELS_S390X
@@ -82,7 +82,7 @@ module Fog
               :spapr_address_type => "spapr-vio",
               :spapr_address_reg => "0x00004000"
             }
-          when "arm" || "aarch64"
+          when "arm" || "aarch64" || "aarch64_be"
             { :model => "tis", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
           when "s390x"
             { :model => "tis", :type => "emulator", :version => "2.0", :passthrough_device_path => "/dev/tpm0" }
