@@ -526,7 +526,7 @@ module Fog
         def initialize_tpm
           # tpm can be a boolean or hash
           if tpm
-            # convert tpm to empty hash not hash value
+            # convert tpm to empty hash if not a hash value
             if !tpm.is_a?(Hash)
               tpm = {}
             end
