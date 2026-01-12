@@ -34,11 +34,11 @@ module Fog
         #
         VERSIONS = ['1.2', '2.0'].freeze
 
-        def initialize(attributes = {}, arch = "")
+        def initialize(arch = "", attributes = {})
           @arch = arch
           super defaults.merge(attributes)
-          raise Fog::Errors::Error.new("#{type} is not a supported TPM type") if new? && !TYPES.include?(type)
-          raise Fog::Errors::Error.new("#{model} is not a supported TPM model") if new? && !supported_models.include?(model)
+          raise Fog::Errors::Error, "#{type} is not a supported TPM type" if new? && !TYPES.include?(type)
+          raise Fog::Errors::Error, "#{model} is not a supported TPM model" if new? && !supported_models.include?(model)
         end
 
         def new?
@@ -46,11 +46,11 @@ module Fog
         end
 
         def save
-          raise Fog::Errors::Error.new('Creating a new TPM device is not yet implemented. Contributions welcome!')
+          raise Fog::Errors::Error, 'Creating a new TPM device is not yet implemented. Contributions welcome!'
         end
 
         def destroy
-          raise Fog::Errors::Error.new('Destroying a TPM device is not yet implemented. Contributions welcome!')
+          raise Fog::Errors::Error. 'Destroying a TPM device is not yet implemented. Contributions welcome!'
         end
 
         def supported_models
@@ -64,7 +64,7 @@ module Fog
           when "s390x"
             MODELS_S390X
           else
-            raise Fog::Errors::Error.new('CPU Architecture does not have any supported TPM models!')
+            raise Fog::Errors::Error 'CPU Architecture does not have any supported TPM models!'
           end
         end
 
