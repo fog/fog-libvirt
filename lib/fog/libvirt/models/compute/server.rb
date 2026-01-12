@@ -414,7 +414,7 @@ module Fog
                   xml.backend(virtio_rng[:backend_path], :model => virtio_rng.fetch(:backend_model, "random"))
                 end
 
-                if tpm[:enable]
+                if tpm_device
                   tpm_model_type = (tpm_device.model == "spapr-tpm-proxy") ? "spapr-tpm-proxy" : "tpm-#{tpm_device.model}"
                   xml.tpm(:model => tpm_model_type) do
                     if tpm_device.type == "passthrough"
