@@ -78,7 +78,7 @@ module Fog
               :model => "spapr",
               :type => "emulator",
               :version => "2.0",
-              :passthrough_device_path => "/dev/tpmrm0",
+              :passthrough_device_path => "/dev/tpm0",
               :spapr_address_type => "spapr-vio",
               :spapr_address_reg => "0x00004000"
             }
