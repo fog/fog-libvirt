@@ -586,7 +586,7 @@ module Fog
             :video                  => {:type => "virtio", :heads => 1},
             :virtio_rng             => {},
             :firmware_features      => { "secure-boot" => "no" },
-            :tpm                    => {:enable => false, :id => "tpm0"}
+            :tpm                    => {:enable => false}
           }
         end
 
