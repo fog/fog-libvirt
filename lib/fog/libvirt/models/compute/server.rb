@@ -416,7 +416,6 @@ module Fog
 
                 if tpm[:enable]
                   tpm_model_type = (tpm_device.model == "spapr-tpm-proxy") ? "spapr-tpm-proxy" : "tpm-#{tpm_device.model}"
-                  
                   xml.tpm(:model => tpm_model_type) do
                     if tpm_device.type == "passthrough"
                       xml.backend(:type => tpm_device.type) do
@@ -425,7 +424,7 @@ module Fog
                     else
                       xml.backend(:type => tpm_device.type, :version => tpm_device.version)
                     end
-                    if tpm_device.model == "spapr" || tpm_device.model == "spapr-tpm-proxy"
+                    if %w[spapr spapr-tpm-proxy].include?(tpm_device.model)
                       xml.address(:type => tpm_device.par_address_type, :reg => tpm_device.spar_address_reg)
                     end
                   end
