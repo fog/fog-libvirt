@@ -415,7 +415,7 @@ module Fog
                 end
 
                 if tpm_device
-                  tpm_model_type = (tpm_device.model == "spapr-tpm-proxy") ? "spapr-tpm-proxy" : "tpm-#{tpm_device.model}"
+                  tpm_model_type = tpm_device.model == "spapr-tpm-proxy" ? "spapr-tpm-proxy" : "tpm-#{tpm_device.model}"
                   xml.tpm(:model => tpm_model_type) do
                     if tpm_device.type == "passthrough"
                       xml.backend(:type => tpm_device.type) do
