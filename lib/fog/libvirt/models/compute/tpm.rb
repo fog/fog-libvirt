@@ -40,6 +40,7 @@ module Fog
           super defaults.merge(attributes)
           raise Fog::Errors::Error, "#{type} is not a supported TPM type" if new? && !TYPES.include?(type)
           raise Fog::Errors::Error, "#{model} is not a supported TPM model" if new? && !supported_models.include?(model)
+          raise Fog::Errors::Error, "TPM model type crb does not a supported TPM version 1.2" if model == "crb" && version == "1.2"
         end
 
         def new?
