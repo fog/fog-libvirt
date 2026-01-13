@@ -36,6 +36,8 @@ module Fog
         attribute :guest_agent
         attribute :video
         attribute :virtio_rng
+        attribute :tpm
+        attribute :tpm_device
 
         attribute :state
 
@@ -58,6 +60,7 @@ module Fog
           super defaults.merge(attributes)
           initialize_nics
           initialize_volumes
+          initialize_tpm
           @user_data = attributes.delete(:user_data)
         end
 
@@ -411,6 +414,22 @@ module Fog
                   xml.backend(virtio_rng[:backend_path], :model => virtio_rng.fetch(:backend_model, "random"))
                 end
 
+                if tpm_device
+                  tpm_model_type = tpm_device.model == "spapr-tpm-proxy" ? "spapr-tpm-proxy" : "tpm-#{tpm_device.model}"
+                  xml.tpm(:model => tpm_model_type) do
+                    if tpm_device.type == "passthrough"
+                      xml.backend(:type => tpm_device.type) do
+                        xml.device(:path => tpm_device.passthrough_device_path)
+                      end
+                    else
+                      xml.backend(:type => tpm_device.type, :version => tpm_device.version)
+                    end
+                    if %w[spapr spapr-tpm-proxy].include?(tpm_device.model)
+                      xml.address(:type => tpm_device.par_address_type, :reg => tpm_device.spar_address_reg)
+                    end
+                  end
+                end
+
                 if arch == "s390x"
                   xml.controller(:type => "scsi", :index => "0", :model => "virtio-scsi")
                   xml.console(:type => "pty") do
@@ -504,6 +523,17 @@ module Fog
           end
         end
 
+        def initialize_tpm
+          # tpm can be a boolean or hash
+          if tpm
+            # convert tpm to empty hash if not a hash value
+            if !tpm.is_a?(Hash)
+              tpm = {}
+            end
+            self.tpm_device = TPM.new(arch, tpm)
+          end
+        end
+
         def create_or_clone_volume
           options = {:name => volume_name || default_volume_name}
           # Check if a disk template was specified
@@ -561,6 +591,7 @@ module Fog
             :video                  => {:type => "virtio", :heads => 1},
             :virtio_rng             => {},
             :firmware_features      => { "secure-boot" => "no" },
+            :tpm                    => false
           }
         end
 
