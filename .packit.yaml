@@ -1,0 +1,35 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+specfile_path: rubygem-fog-libvirt.spec
+
+# add or remove files that should be synced
+files_to_sync:
+  - rubygem-fog-libvirt.spec
+  - .packit.yaml
+
+# name in upstream package repository or registry (e.g. in PyPI)
+upstream_package_name: fog-libvirt
+# downstream (Fedora) RPM package name
+downstream_package_name: rubygem-fog-libvirt
+
+upstream_tag_template: v{version}
+
+actions:
+  post-upstream-clone:
+    - "wget https://raw.githubusercontent.com/theforeman/foreman-packaging/rpm/develop/packages/foreman/rubygem-fog-libvirt/rubygem-fog-libvirt.spec -O rubygem-fog-libvirt.spec"
+  get-current-version:
+    - ruby -rrubygems -e 'puts Gem::Specification::load(Dir.glob("*.gemspec").first).version'
+  create-archive:
+    - gem build fog-libvirt.gemspec
+    - bash -c "ls -1t ./fog-libvirt-*.gem | head -n 1"
+
+jobs:
+  - job: copr_build
+    trigger: pull_request
+    targets:
+      - rhel-9
+
+srpm_build_deps:
+  - wget
+  - rubygems
