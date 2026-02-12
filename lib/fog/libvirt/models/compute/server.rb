@@ -254,12 +254,14 @@ module Fog
         end
 
         def generate_config_iso_in_dir(dir_path, user_data, &blk)
-          FileUtils.touch(File.join(dir_path, "meta-data"))
-          File.open(File.join(dir_path, 'user-data'), 'w') { |f| f.write user_data }
+          meta_data_path = File.join(dir_path, "meta-data")
+          FileUtils.touch(meta_data_path)
+          user_data_path = File.join(dir_path, 'user-data')
+          File.write(user_data_path, user_data)
 
           isofile = Tempfile.new(['init', '.iso']).path
-          unless system("genisoimage -output #{isofile} -volid cidata -joliet -rock #{File.join(dir_path, 'user-data')} #{File.join(dir_path, 'meta-data')}")
-            raise Fog::Errors::Error.new("Couldn't generate cloud-init iso disk with genisoimage.")
+          unless system('xorrisofs', '-output', isofile, '-volid', 'cidata', '-joliet', '-rock', user_data_path, meta_data_path)
+            raise Fog::Errors::Error.new("Couldn't generate cloud-init iso disk with xorrisofs.")
           end
           blk.call(isofile)
         end
