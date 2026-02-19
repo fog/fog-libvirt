@@ -12,7 +12,7 @@ Shindo.tests('Fog::Compute[:libvirt]', ['libvirt']) do
     %w{ create_domain create_volume define_domain define_pool destroy_interface destroy_network get_node_info
         update_autostart list_domains
         list_interfaces list_networks list_pools list_pool_volumes list_volumes pool_action vm_action volume_action
-        dhcp_leases }.each do |request|
+        dhcp_leases upload_iso attach_iso detach_iso destroy_iso }.each do |request|
       test("it should respond to #{request}") { compute.respond_to? request }
     end
   end

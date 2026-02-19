@@ -4,6 +4,9 @@ require 'securerandom'
 module Fog
   module Libvirt
     module Util
+      DEFAULT_CDROM_TARGET_DEV = "sdc".freeze
+      DEFAULT_CDROM_BUS = "sata".freeze
+
       def xml_element(xml, path, attribute=nil)
         xml = Nokogiri::XML(xml)
         attribute.nil? ? (xml/path).first.text : (xml/path).first[attribute.to_sym]
@@ -16,6 +19,10 @@ module Fog
 
       def randomized_name
         "fog-#{(SecureRandom.random_number*10E14).to_i.round}"
+      end
+
+      def default_iso_dir
+        "/var/lib/libvirt/images"
       end
     end
   end
