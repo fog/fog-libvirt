@@ -523,10 +523,10 @@ module Fog
             # external dnsmasq running in a network namespace on WSL2), the
             # DHCPLeases API returns empty.  Read the dnsmasq lease file directly.
             if ip_address.nil? && net
-              @leasefile_fallback_warned ||= {}
-              unless @leasefile_fallback_warned[nic.mac]
+              @@leasefile_fallback_warned ||= {}
+              unless @@leasefile_fallback_warned[nic.mac]
                 Fog::Logger.warning("DHCPLeases API returned no address for #{nic.mac}; falling back to dnsmasq lease file.")
-                @leasefile_fallback_warned[nic.mac] = true
+                @@leasefile_fallback_warned[nic.mac] = true
               end
               ip_address = ip_address_from_leasefile(net, nic.mac)
             end
