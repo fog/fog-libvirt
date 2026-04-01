@@ -480,9 +480,49 @@ module Fog
             net = service.networks.all(:name => nic.network).first
             # Assume the lease expiring last is the current IP address
             ip_address = net&.dhcp_leases(nic.mac)&.max_by { |lse| lse["expirytime"] }&.dig("ipaddr")
+
+            # Fallback: when the network has no libvirt-managed DHCP (e.g. an
+            # external dnsmasq running in a network namespace on WSL2), the
+            # DHCPLeases API returns empty.  Read the dnsmasq lease file directly.
+            if ip_address.nil? && net
+              ip_address = ip_address_from_leasefile(net, nic.mac)
+            end
           end
 
           return { :public => [ip_address], :private => [ip_address] }
+        end
+
+        # Read IP from a dnsmasq lease file when the libvirt DHCPLeases API
+        # returns nothing.  This happens when DHCP is provided by an external
+        # dnsmasq (not started by libvirt) -- for example, a dnsmasq running
+        # inside a network namespace to work around port conflicts on WSL2.
+        #
+        # dnsmasq lease file format (space-separated):
+        #   <expiry> <mac> <ip> <hostname> [<client-id>]
+        def ip_address_from_leasefile(net, mac)
+          lease_dir  = '/var/lib/libvirt/dnsmasq'
+          net_name   = net.name rescue nil
+          return nil unless net_name
+
+          lease_file = File.join(lease_dir, "#{net_name}.leases")
+          return nil unless File.exist?(lease_file)
+
+          target_mac = mac.to_s.downcase
+          best_expiry = 0
+          best_ip = nil
+
+          File.foreach(lease_file) do |line|
+            parts = line.strip.split
+            next unless parts.length >= 4
+
+            expiry, lease_mac, ip = parts[0].to_i, parts[1].downcase, parts[2]
+            if lease_mac == target_mac && expiry > best_expiry
+              best_expiry = expiry
+              best_ip = ip
+            end
+          end
+
+          best_ip
         end
 
         # Locale-friendly removal of non-alpha nums
