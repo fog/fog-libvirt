@@ -485,12 +485,15 @@ module Fog
             # external dnsmasq running in a network namespace on WSL2), the
             # DHCPLeases API returns empty.  Read the dnsmasq lease file directly.
             if ip_address.nil? && net
+              Fog::Logger.warning("DHCPLeases API returned no address for #{nic.mac}; falling back to dnsmasq lease file.")
               ip_address = ip_address_from_leasefile(net, nic.mac)
             end
           end
 
           return { :public => [ip_address], :private => [ip_address] }
         end
+
+        DNSMASQ_LEASE_DIR = '/var/lib/libvirt/dnsmasq'.freeze
 
         # Read IP from a dnsmasq lease file when the libvirt DHCPLeases API
         # returns nothing.  This happens when DHCP is provided by an external
@@ -500,33 +503,33 @@ module Fog
         # dnsmasq lease file format (space-separated):
         #   <expiry> <mac> <ip> <hostname> [<client-id>]
         def ip_address_from_leasefile(net, mac)
-          lease_dir  = '/var/lib/libvirt/dnsmasq'
-          net_name   = net.name rescue nil
+          net_name = net.name
           return nil unless net_name
 
-          lease_file = File.join(lease_dir, "#{net_name}.leases")
+          lease_file = File.join(DNSMASQ_LEASE_DIR, "#{net_name}.leases")
           return nil unless File.exist?(lease_file)
 
           target_mac = mac.to_s.downcase
           best_expiry = 0
           best_ip = nil
 
-          File.foreach(lease_file) do |line|
-            parts = line.strip.split
-            next unless parts.length >= 4
+          begin
+            File.foreach(lease_file) do |line|
+              parts = line.strip.split
+              next unless parts.length >= 4
 
-            expiry, lease_mac, ip = parts[0].to_i, parts[1].downcase, parts[2]
-            if lease_mac == target_mac && expiry > best_expiry
-              best_expiry = expiry
-              best_ip = ip
+              expiry, lease_mac, ip = parts[0].to_i, parts[1].downcase, parts[2]
+              if lease_mac == target_mac && expiry > best_expiry
+                best_expiry = expiry
+                best_ip = ip
+              end
             end
+          rescue Errno::EACCES, Errno::ENOENT
+            return nil
           end
 
           best_ip
         end
-
-        # Locale-friendly removal of non-alpha nums
-        DOMAIN_CLEANUP_REGEXP = Regexp.compile('[\W_-]')
 
         def ip_address(key)
           addresses[key]&.first
