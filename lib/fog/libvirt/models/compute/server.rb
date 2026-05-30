@@ -481,7 +481,11 @@ module Fog
         # if the server has multiple network interface
         def addresses(service_arg=service, options={})
           ip_address = nil
-          if (nic = self.nics&.first)
+          # Pick the first nic that actually has a network. Bridge/direct
+          # interfaces carry a nil network name, which can't be looked up and
+          # never has a libvirt-managed lease, so skip them in favour of a nic
+          # that can resolve to an address.
+          if (nic = self.nics&.find { |n| n.network })
             net = service.networks.all(:name => nic.network).first
             # Assume the lease expiring last is the current IP address
             ip_address = net&.dhcp_leases(nic.mac)&.max_by { |lse| lse["expirytime"] }&.dig("ipaddr")
