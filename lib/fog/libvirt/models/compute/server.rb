@@ -498,7 +498,9 @@ module Fog
               parts = line.strip.split
               next unless parts.length >= 4
 
-              expiry, lease_mac, ip = parts[0].to_i, parts[1].downcase, parts[2]
+              expiry = parts[0].to_i
+              lease_mac = parts[1].downcase
+              ip = parts[2]
               if lease_mac == target_mac && expiry > best_expiry
                 best_expiry = expiry
                 best_ip = ip
@@ -525,17 +527,27 @@ module Fog
             # Fallback: when the network has no libvirt-managed DHCP (e.g. an
             # external dnsmasq running in a network namespace on WSL2), the
             # DHCPLeases API returns empty.  Read the dnsmasq lease file directly.
-            if ip_address.nil? && net
-              @@leasefile_fallback_warned ||= {}
-              unless @@leasefile_fallback_warned[nic.mac]
-                Fog::Logger.warning("DHCPLeases API returned no address for #{nic.mac}; falling back to dnsmasq lease file.")
-                @@leasefile_fallback_warned[nic.mac] = true
-              end
+            #
+            # Only attempt this for a local connection: the lease file lives on
+            # the libvirt host's filesystem, so for a remote URI (e.g. qemu+ssh)
+            # we would be reading the client machine's files instead.
+            if ip_address.nil? && net && !service.uri.remote?
+              warn_leasefile_fallback(nic.mac)
               ip_address = ip_address_from_leasefile(net, nic.mac)
             end
           end
 
           return { :public => [ip_address], :private => [ip_address] }
+        end
+
+        # Warn once per MAC (per server instance) when falling back to the
+        # dnsmasq lease file, to avoid log spam on repeated address lookups.
+        def warn_leasefile_fallback(mac)
+          @leasefile_warned_macs ||= {}
+          return if @leasefile_warned_macs[mac]
+
+          Fog::Logger.warning("DHCPLeases API returned no address for #{mac}; falling back to dnsmasq lease file.")
+          @leasefile_warned_macs[mac] = true
         end
 
         def ip_address(key)

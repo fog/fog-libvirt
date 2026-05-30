@@ -65,7 +65,7 @@ class LeasefileFallbackTest < Minitest::Test
   end
 
   def test_returns_nil_on_permission_error
-    skip("Cannot test permission denial as root") if Process.uid == 0
+    skip("Cannot test permission denial as root") if Process.uid.zero?
     write_lease_file("default", "1000 52:54:00:01:02:03 192.168.122.10 host1 *\n")
     File.chmod(0o000, File.join(@tmpdir, "default.leases"))
     result = @server.send(:ip_address_from_leasefile, @net, @mac)
@@ -78,7 +78,34 @@ class LeasefileFallbackTest < Minitest::Test
     assert_nil result
   end
 
+  def test_addresses_uses_leasefile_for_local_connection
+    write_lease_file("default", "1000 52:54:00:01:02:03 192.168.122.10 host1 *\n")
+    stub_addresses_lookup(:remote => false)
+    result = @server.send(:addresses)
+    assert_equal "192.168.122.10", result[:public].first
+  end
+
+  def test_addresses_skips_leasefile_for_remote_connection
+    write_lease_file("default", "1000 52:54:00:01:02:03 192.168.122.10 host1 *\n")
+    stub_addresses_lookup(:remote => true)
+    result = @server.send(:addresses)
+    assert_nil result[:public].first
+  end
+
   private
+
+  # Wire up the minimum collaborators so #addresses reaches the lease-file
+  # fallback: a NIC with no libvirt DHCP lease, and a connection whose URI is
+  # local or remote depending on :remote.
+  def stub_addresses_lookup(remote:)
+    nic = stub(:mac => @mac, :network => "default")
+    @server.stubs(:nics).returns([nic])
+    net = stub(:name => "default", :dhcp_leases => [])
+    networks = stub
+    networks.stubs(:all).returns([net])
+    @server.service.stubs(:networks).returns(networks)
+    @server.service.stubs(:uri).returns(stub(:remote? => remote))
+  end
 
   def write_lease_file(net_name, content)
     File.write(File.join(@tmpdir, "#{net_name}.leases"), content)
