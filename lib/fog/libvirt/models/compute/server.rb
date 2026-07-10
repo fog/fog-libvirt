@@ -395,6 +395,10 @@ module Fog
                     xml.address(:type => "drive", :controller => 0, :bus => 0, :unit => 0)
                   end
                 end
+                
+                if volumes.any? { |v| v.bus == 'scsi' }
+                  xml.controller(:type => 'scsi', :index => '0', :model => 'virtio-scsi')
+                end
 
                 nics.each do |nic|
                   xml.interface(:type => nic.type) do
