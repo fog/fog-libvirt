@@ -395,7 +395,9 @@ module Fog
                     xml.address(:type => "drive", :controller => 0, :bus => 0, :unit => 0)
                   end
                 end
-                if volumes.any? { |v| v.bus == 'scsi' }
+
+                if volumes.any? { |v| v.respond_to?(:bus) && v.bus == 'scsi' } || 
+                    (respond_to?(:disks) && disks.any? { |d| d.is_a?(Hash) && d[:bus] == 'scsi' })
                   xml.controller(:type => 'scsi', :index => '0', :model => 'virtio-scsi')
                 end
 
