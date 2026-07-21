@@ -102,6 +102,10 @@ module Fog
         first + rest.map(&:capitalize).join
       end
 
+      def attrs_underscore(attrs)
+        attrs.to_h.transform_keys { |name| self.class.xml_underscore(name.to_s).to_sym }
+      end
+
       def value_xml(value, switch: false)
         return nil if value.nil?
 
@@ -120,6 +124,59 @@ module Fog
 
       def models_cast(models, type)
         self.class.models_cast(models, type)
+      end
+
+      def normalize_ip_range(range)
+        end_val = range.end.to_s
+        if range.exclude_end?
+          last_ip = IPAddr.new(end_val)
+          end_val = IPAddr.new(last_ip.to_i - 1, last_ip.family).to_s
+        end
+        { :start => range.begin.to_s, :end => end_val }
+      end
+
+      def normalize_number_range(range)
+        end_val = range.end.to_i
+        end_val -= 1 if range.exclude_end?
+        { :start => range.begin.to_i, :end => end_val }
+      end
+
+      def model_empty?(model)
+        return true if model.nil?
+
+        if model.respond_to?(:attributes)
+          model.attributes.values.all? { |value| model_empty?(value) }
+        elsif model.respond_to?(:empty?)
+          model.empty?
+        else
+          false
+        end
+      end
+
+      def models_equal?(left, right)
+        return true if left.nil? && model_empty?(right)
+        return true if right.nil? && model_empty?(left)
+        return false unless left.instance_of?(right.class)
+
+        if left.is_a?(Array)
+          model_arrays_equal?(left, right)
+        elsif left.is_a?(Hash)
+          model_hashes_equal?(left, right)
+        elsif left.respond_to?(:attributes)
+          models_equal?(left.attributes, right.attributes)
+        else
+          left == right
+        end
+      end
+
+      private
+
+      def model_arrays_equal?(left, right)
+        left.length == right.length && left.zip(right).all? { |x, y| models_equal?(x, y) }
+      end
+
+      def model_hashes_equal?(left, right)
+        left.length == right.length && left.all? { |key, value| right.key?(key) && models_equal?(value, right[key]) }
       end
     end
   end
