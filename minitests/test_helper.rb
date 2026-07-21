@@ -1,3 +1,8 @@
+unless ['false', 'no', '0'].include?(ENV['COVERAGE'].to_s.downcase)
+  require 'simplecov'
+  SimpleCov.start
+end
+
 require 'minitest/autorun'
 require 'mocha/minitest'
 require 'fileutils'

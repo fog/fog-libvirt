@@ -34,6 +34,7 @@ end
 #############################################################################
 
 GEM_NAME = "#{name}"
+ENV['COVERAGE'] ||= 'true'
 task :default => [:test, :minitest]
 
 Rake::TestTask.new(:minitest) do |t|
