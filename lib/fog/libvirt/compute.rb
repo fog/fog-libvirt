@@ -38,6 +38,11 @@ module Fog
       request :upload_volume
       request :clone_volume
       request :list_networks
+      request :define_network
+      request :create_network
+      request :update_network
+      request :update_network_autostart
+      request :update_network_section
       request :destroy_network
       request :dhcp_leases
       request :list_interfaces

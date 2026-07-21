@@ -1,3 +1,5 @@
+require "nokogiri"
+
 module Fog
   module Libvirt
     class Compute
@@ -37,11 +39,21 @@ module Fog
             bridge_name = ''
           end
 
-          {
+          attrs = {
             :uuid        => net.uuid,
             :name        => net.name,
+            :persistent  => net.persistent?,
+            :active      => net.active?,
+            :autostart   => net.autostart?,
             :bridge_name => bridge_name
           }
+
+          network_attrs = Fog::Libvirt::Compute::Network.parse_xml(net.xml_desc)
+          if network_attrs
+            attrs = network_attrs.merge(attrs)
+            attrs[:preloaded] = true
+          end
+          attrs
         end
       end
 
