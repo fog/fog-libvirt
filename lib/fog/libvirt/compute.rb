@@ -22,6 +22,7 @@ module Fog
       collection  :nodes
       model       :nic
       collection  :nics
+      model       :tpm
 
       request_path 'fog/libvirt/requests/compute'
       request :list_domains
