@@ -21,3 +21,6 @@ if Fog.mocking?
 else
   FOG_TESTING_TIMEOUT = Fog.timeout
 end
+
+Thread.current[:tags] ||= []
+Thread.current[:tags] << "-requires-mocks" unless Fog.mock?
