@@ -24,7 +24,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         }
       end
     end
-    tests('have an ip_address action that') do
+    tests('have an ip_address action that', 'requires-mocks') do
       test('returns the latest IP address lease') { server.public_ip_address() == '1.2.5.6' }
     end
     tests('have attributes') do
