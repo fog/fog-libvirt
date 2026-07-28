@@ -24,3 +24,4 @@ end
 
 Thread.current[:tags] ||= []
 Thread.current[:tags] << "-requires-mocks" unless Fog.mock?
+Thread.current[:tags] << (real_libvirt? ? "-requires-test-driver" : "-requires-real-libvirt")
