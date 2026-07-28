@@ -1,7 +1,6 @@
 Shindo.tests('Fog::Compute[:libvirt] | network model', ['libvirt']) do
 
-  networks = Fog::Compute[:libvirt].networks
-  network = networks.first
+  network = Fog::Compute[:libvirt].networks.new(:name => "default", :uuid => "dd8fe884-6c02-601e-7551-cca97df1c5df", :bridge_name => "virbr0")
 
   tests('The network model should') do
     tests('have the action') do

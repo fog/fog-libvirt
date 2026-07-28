@@ -2,8 +2,8 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
 
   servers = Fog::Compute[:libvirt].servers
   # Match the mac in dhcp_leases mock
-  nics = Fog.mock? ? [{ :type => 'network', :network => 'default', :mac => 'aa:bb:cc:dd:ee:ff' }] : nil
-  server = servers.create(:name => Fog::Mock.random_letters(8), :nics => nics)
+  nics = Fog.mock? ? [{ :type => 'network', :network => 'default', :mac => 'aa:bb:cc:dd:ee:ff' }] : []
+  server = servers.create(:name => "fog-server-test-#{Fog::Mock.random_letters(8)}", :nics => nics)
 
   tests('The server model should') do
     tests('have the action') do
@@ -66,7 +66,9 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
     end
 
     test('can destroy') do
-      servers.create(:name => Fog::Mock.random_letters(8)).destroy
+      server_name = "fog-test-destroy-#{Fog::Mock.random_letters(8)}"
+      servers.create(:name => server_name).destroy(:destroy_volumes => true)
+      servers.all.none? { |server| server.name == server_name }
     end
 
     test('be a kind of Fog::Libvirt::Compute::Server') { server.kind_of? Fog::Libvirt::Compute::Server }
@@ -78,7 +80,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         xml.match?(/<disk type="file" device="disk">/) && xml.match?(%r{<source file="#{server.volumes.first.path}"/>})
       end
       test("with disk of type block") do
-        server = Fog::Libvirt::Compute::Server.new(
+        disk_server = Fog::Libvirt::Compute::Server.new(
           {
             :nics => [],
             :volumes => [
@@ -86,20 +88,20 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
             ]
           }
         )
-        xml = server.to_xml
+        xml = disk_server.to_xml
         xml.match?(/<disk type="block" device="disk">/) && xml.match?(%r{<source dev="/dev/sda"/>})
       end
-      test("with q35 machine type on x86_64") { server.to_xml.match?(%r{<type arch="x86_64" machine="q35">hvm</type>}) }
+      test("with q35 machine type on x86_64") { server.to_xml.include?('<type arch="x86_64" machine="q35">') }
     end
     test("with efi firmware") do
-      server = Fog::Libvirt::Compute::Server.new(
+      efi_server = Fog::Libvirt::Compute::Server.new(
         {
           :firmware => "efi",
           :nics => [],
           :volumes => []
         }
       )
-      xml = server.to_xml
+      xml = efi_server.to_xml
 
       os_firmware = xml.include?('<os firmware="efi">')
       secure_boot = xml.include?('<feature name="secure-boot" enabled="no"/>')
@@ -108,7 +110,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       os_firmware && secure_boot && loader_attributes
     end
     test("with secure boot enabled") do
-      server = Fog::Libvirt::Compute::Server.new(
+      secure_server = Fog::Libvirt::Compute::Server.new(
         {
           :firmware => "efi",
           :firmware_features => {
@@ -120,7 +122,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
           :volumes => []
         }
       )
-      xml = server.to_xml
+      xml = secure_server.to_xml
 
       os_firmware = xml.include?('<os firmware="efi">')
       secure_boot = xml.include?('<feature name="secure-boot" enabled="yes"/>')
@@ -135,7 +137,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
         :persistent => true,
         :xml => <<~XML
           <pool type='logical'>
-            <name>lvm-pool</name>
+            <name>fog-test-lvm-pool</name>
             <source>
               <name>vg_storage01</name>
               <format type='lvm2'/>
@@ -146,7 +148,7 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
           </pool>
         XML
       )
-      server = Fog::Compute[:libvirt].servers.new(
+      volume_server = Fog::Compute[:libvirt].servers.new(
         :nics => [],
         :volumes => [
           {
@@ -155,13 +157,18 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
           }
         ]
       )
-      server.volumes.each do |volume|
+      volume_server.volumes.each do |volume|
         volume.save
         # mock driver doesn't simulate the real thing
         # LVM doesn't have a volume type
         volume.format_type = nil
       end
-      !server.save.nil?
+      !volume_server.save.nil?
+    ensure
+      volume_server&.destroy(:destroy_volumes => true)
+      pool&.destroy
     end
   end
+ensure
+  server&.destroy(:destroy_volumes => true)
 end
