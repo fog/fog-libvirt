@@ -396,6 +396,11 @@ module Fog
                   end
                 end
 
+                if volumes.any? { |v| v.respond_to?(:bus) && v.bus == 'scsi' } || 
+                    (respond_to?(:disks) && disks.any? { |d| d.is_a?(Hash) && d[:bus] == 'scsi' })
+                  xml.controller(:type => 'scsi', :index => '0', :model => 'virtio-scsi')
+                end
+
                 nics.each do |nic|
                   xml.interface(:type => nic.type) do
                     xml.mac(:address => nic.mac) if nic.mac
