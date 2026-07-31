@@ -45,6 +45,10 @@ module Fog
       request :get_node_info
       request :update_autostart
       request :update_display
+      request :upload_iso
+      request :attach_iso
+      request :detach_iso
+      request :destroy_iso
       request :libversion
 
       module Shared

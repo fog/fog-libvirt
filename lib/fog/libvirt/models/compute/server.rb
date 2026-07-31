@@ -61,6 +61,33 @@ module Fog
           @user_data = attributes.delete(:user_data)
         end
 
+        def upload_iso(file_path, volume_name = nil, pool_name = nil)
+          raise ArgumentError, "file_path is a required parameter" if file_path.nil?
+
+          volume_name ||= File.basename(file_path)
+          pool_name ||= default_iso_pool_name
+          service.upload_iso(pool_name, volume_name, file_path)
+        end
+
+        def attach_iso(path, options = {})
+          raise ArgumentError, "path is a required parameter" if path.nil?
+
+          iso_path = File.absolute_path?(path) ? path : File.join(iso_dir || default_iso_dir, path)
+          service.attach_iso(uuid, iso_path, options)
+        end
+
+        def detach_iso(options = {})
+          service.detach_iso(uuid, options)
+        end
+
+        def destroy_iso(volume_name, pool_name = nil)
+          raise ArgumentError, "volume_name is a required parameter" if volume_name.nil?
+
+          iso_name = File.basename(volume_name)
+          pool_name ||= service.volumes.all(:name => iso_name).first&.pool_name || default_iso_pool_name
+          service.destroy_iso(pool_name, iso_name)
+        end
+
         def new?
           uuid.nil?
         end
@@ -542,12 +569,13 @@ module Fog
           @volumes.nil? ? @volumes = [volume] : @volumes << volume
         end
 
-        def default_iso_dir
-          "/var/lib/libvirt/images"
-        end
-
         def default_volume_name
           "#{name}.#{volume_format_type || 'img'}"
+        end
+
+        def default_iso_pool_name
+          volume = volumes&.first
+          volume&.pool_name || "default"
         end
 
         def defaults

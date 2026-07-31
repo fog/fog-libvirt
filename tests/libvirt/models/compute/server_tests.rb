@@ -13,6 +13,9 @@ Shindo.tests('Fog::Compute[:libvirt] | server model', ['libvirt']) do
       %w{ start stop destroy reboot suspend }.each do |action|
         test(action) { server.respond_to? action }
       end
+      %w{ upload_iso attach_iso detach_iso destroy_iso }.each do |action|
+        test(action) { server.respond_to? action }
+      end
       %w{ start reboot suspend stop }.each do |action|
         test("#{action} returns successfully") {
           begin
