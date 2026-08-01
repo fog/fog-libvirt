@@ -42,6 +42,10 @@ module Fog
           end
         end
 
+        def domain_disks(xml)
+          xml_elements(xml, "domain/devices/disk").map { |disk_el| Server::Disk.parse_xml(disk_el) }
+        end
+
         def boot_order xml
           xml_elements(xml, "domain/os/boot", "dev")
         end
@@ -92,19 +96,25 @@ module Fog
               :autostart       => dom.autostart?,
               :os_type         => dom.os_type,
               :active          => dom.active?,
-              :display         => domain_display(dom.xml_desc),
-              :boot_order      => boot_order(dom.xml_desc),
-              :nics            => domain_interfaces(dom.xml_desc),
-              :volumes_path    => domain_volumes(dom.xml_desc),
               :state           => states[dom.info.state],
-              :firmware        => firmware(dom.xml_desc),
-              :secure_boot     => secure_boot_enabled?(dom.xml_desc),
-            }
+            }.merge(xml_attributes(dom))
           rescue ::Libvirt::RetrieveError, ::Libvirt::Error
             # Catch libvirt exceptions to avoid race conditions involving
             # concurrent libvirt operations (like from another process)
             return nil
           end
+        end
+
+        def xml_attributes(dom)
+          {
+            :display         => domain_display(dom.xml_desc),
+            :boot_order      => boot_order(dom.xml_desc),
+            :nics            => domain_interfaces(dom.xml_desc),
+            :disks           => domain_disks(dom.xml_desc),
+            :volumes_path    => domain_volumes(dom.xml_desc),
+            :firmware        => firmware(dom.xml_desc),
+            :secure_boot     => secure_boot_enabled?(dom.xml_desc),
+          }
         end
       end
 

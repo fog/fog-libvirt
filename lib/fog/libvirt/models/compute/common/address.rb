@@ -18,6 +18,8 @@ module Fog
         end
 
         def self.types
+          require_relative "pci_address"
+          require_relative "drive_address"
           {
             :pci => PciAddress,
             :drive => DriveAddress
