@@ -43,6 +43,45 @@ module Fog
 
           value
         end
+
+        def autocast_on_assign(name, type)
+          assign_name = "#{name}=".to_sym
+          remove_method(assign_name) if method_defined?(assign_name)
+          if type.is_a?(Array)
+            type = type.first
+            raise "Missing type for Array" if type.nil?
+
+            create_array_assigner(assign_name, name, type)
+          else
+            define_method(assign_name) do |value|
+              attributes[name] = value.nil? || value.is_a?(type) ? value : type.new(value)
+            end
+          end
+        end
+
+        def model_cast(value, type)
+          return value if value.is_a?(type)
+
+          type.new(value)
+        end
+
+        def models_cast(models, type)
+          models.map { |model| model_cast(model, type) }
+        end
+
+        private
+
+        def create_array_assigner(assign_name, attr_name, type)
+          define_method(assign_name) do |values|
+            attributes[attr_name] = if values.nil?
+                                      []
+                                    elsif !values.is_a?(Array)
+                                      [values.is_a?(type) ? values : type.new(values)]
+                                    else
+                                      values.map { |value| value.is_a?(type) ? value : type.new(value) }
+                                    end
+          end
+        end
       end
 
       def self.included(base)
@@ -73,6 +112,14 @@ module Fog
         end
 
         value
+      end
+
+      def model_cast(value, type)
+        self.class.model_cast(value, type)
+      end
+
+      def models_cast(models, type)
+        self.class.models_cast(models, type)
       end
     end
   end
