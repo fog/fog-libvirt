@@ -284,6 +284,7 @@ module Fog
 
         # rubocop:disable Metrics
         def to_xml
+          scsi_controller = nil
           builder = Nokogiri::XML::Builder.new do |xml|
             xml.domain(:type => domain_type) do
               xml.name(name)
@@ -368,7 +369,9 @@ module Fog
                         end
                       end
 
-                      xml.target(:dev => target_device, :bus => ceph_args["bus_type"] == "virtio" ? "virtio" : "scsi")
+                      ceph_bus = ceph_args["bus_type"] == "virtio" ? "virtio" : "scsi"
+                      scsi_controller ||= create_scsi_controller if ceph_bus == "scsi"
+                      xml.target(:dev => target_device, :bus => ceph_bus)
                     end
                   else
                     is_block = volume.path.start_with?("/dev/")
@@ -394,6 +397,7 @@ module Fog
                     xml.readonly
                     xml.address(:type => "drive", :controller => 0, :bus => 0, :unit => 0)
                   end
+                  scsi_controller ||= create_scsi_controller
                 end
 
                 nics.each do |nic|
@@ -419,7 +423,8 @@ module Fog
                 end
 
                 if arch == "s390x"
-                  xml.controller(:type => "scsi", :index => "0", :model => "virtio-scsi")
+                  scsi_controller ||= create_scsi_controller
+
                   xml.console(:type => "pty") do
                     xml.target(:type => "sclp")
                   end
@@ -449,6 +454,8 @@ module Fog
                     xml.model(video)
                   end
                 end
+
+                xml.controller(scsi_controller) if scsi_controller
               end
             end
           end
@@ -540,6 +547,14 @@ module Fog
             end
           end
           @volumes.nil? ? @volumes = [volume] : @volumes << volume
+        end
+
+        def create_controller(type, index, model)
+          { :type => type, :index => index, :model => model }
+        end
+
+        def create_scsi_controller
+          create_controller("scsi", 0, "virtio-scsi")
         end
 
         def default_iso_dir
