@@ -1,5 +1,6 @@
 require 'fog/compute/models/server'
 require 'fog/libvirt/models/compute/util/util'
+require 'fog/libvirt/models/compute/server/disk'
 require 'fileutils'
 
 module Fog
@@ -28,6 +29,7 @@ module Fog
         attribute :autostart
         attribute :nics
         attribute :volumes
+        attribute :disks, :type => Array
         attribute :active
         attribute :boot_order
         attribute :display
@@ -38,6 +40,8 @@ module Fog
         attribute :virtio_rng
 
         attribute :state
+
+        autocast_on_assign :disks, [Disk]
 
         # The following attributes are only needed when creating a new vm
         #TODO: Add depreciation warning
@@ -284,6 +288,11 @@ module Fog
 
         # rubocop:disable Metrics
         def to_xml
+          all_disks = disks + volume_disks
+          if (iso = iso_disk)
+            all_disks << iso
+          end
+
           builder = Nokogiri::XML::Builder.new do |xml|
             xml.domain(:type => domain_type) do
               xml.name(name)
@@ -347,54 +356,7 @@ module Fog
               end
 
               xml.devices do
-                ceph_args = read_ceph_args
-
-                volumes.each_with_index do |volume, index|
-                  target_device = "vd#{('a'..'z').to_a[index]}"
-                  if ceph_args && volume.pool_name.include?(ceph_args["libvirt_ceph_pool"])
-                    xml.disk(:type => "network", :device => "disk") do
-                      xml.driver(:name => "qemu", :type => volume.format_type, :cache => "writeback", :discard => "unmap")
-                      xml.source(:protocol => "rbd", :name => volume.path)
-
-                      ceph_args["monitor"]&.split(",")&.each do |monitor|
-                        xml.host(:name => monitor, :port => ceph_args["port"])
-                      end
-
-                      xml.auth(:username => ceph_args["auth_username"]) do
-                        if ceph_args.key?("auth_uuid")
-                          xml.secret(:type => "ceph", :uuid => ceph_args["auth_uuid"])
-                        else
-                          xml.secret(:type => "ceph", :usage => ceph_args["auth_usage"])
-                        end
-                      end
-
-                      xml.target(:dev => target_device, :bus => ceph_args["bus_type"] == "virtio" ? "virtio" : "scsi")
-                    end
-                  else
-                    is_block = volume.path.start_with?("/dev/")
-                    xml.disk(:type => is_block ? "block" : "file", :device => "disk") do
-                      driver = xml.driver(:name => "qemu")
-                      driver[:type] = volume.format_type if volume.format_type
-
-                      if is_block
-                        xml.source(:dev => volume.path)
-                      else
-                        xml.source(:file => volume.path)
-                      end
-                      xml.target(:dev => target_device, :bus => "virtio")
-                    end
-                  end
-                end
-
-                if iso_file
-                  xml.disk(:type => "file", :device => "cdrom") do
-                    xml.driver(:name => "qemu", :type => "raw")
-                    xml.source(:file => "#{iso_dir}/#{iso_file}")
-                    xml.target(:dev => "sda", :bus => "scsi")
-                    xml.readonly
-                    xml.address(:type => "drive", :controller => 0, :bus => 0, :unit => 0)
-                  end
-                end
+                all_disks.each { |disk| model_cast(disk, Disk).build_xml(xml) }
 
                 nics.each do |nic|
                   xml.interface(:type => nic.type) do
@@ -540,6 +502,97 @@ module Fog
             end
           end
           @volumes.nil? ? @volumes = [volume] : @volumes << volume
+        end
+
+        def volume_disks
+          used_names = disk_device_names
+          @volumes.to_a.filter_map do |volume|
+            next if disks.any? { |disk| disk_source_path(disk) == volume.path }
+
+            name = disk_next_name("vd", used_names)
+            used_names << name
+            disk_from_volume(volume, name)
+          end
+        end
+
+        def disk_from_volume(volume, target_device)
+          ceph_args = read_ceph_args
+          is_ceph = ceph_args && volume.pool_name.include?(ceph_args["libvirt_ceph_pool"])
+          disk_attrs = {
+            :type => 'file',
+            :device => 'disk',
+            :driver => { :name => 'qemu', :type => volume.format_type }.compact,
+            :target => { :dev => target_device, :bus => 'virtio' }
+          }
+          if is_ceph
+            disk_attrs[:type] = 'network'
+            disk_attrs[:driver][:cache] = 'writeback'
+            disk_attrs[:driver][:discard] = 'unmap'
+            disk_attrs[:target][:bus] = 'scsi' unless ceph_args["bus_type"] == 'virtio'
+            disk_attrs[:source] = ceph_source(ceph_args, volume)
+          else
+            is_block = volume.path.start_with?("/dev/")
+            disk_attrs[:type] = 'block' if is_block
+            disk_attrs[:source] = is_block ? { :dev => volume.path } : { :file => volume.path }
+          end
+          Disk.new(disk_attrs)
+        end
+
+        def ceph_source(ceph_args, volume)
+          source = { :protocol => 'rbd', :name => volume.path, :hosts => [] }
+
+          ceph_args["monitor"]&.split(",")&.each do |monitor|
+            source[:hosts] << { :name => monitor, :port => ceph_args["port"] }
+          end
+
+          secret_attrs = if ceph_args.key?("auth_uuid")
+                           { :type => 'ceph', :uuid => ceph_args["auth_uuid"] }
+                         else
+                           { :type => 'ceph', :usage => ceph_args["auth_usage"] }
+                         end
+
+          source[:auth] = {
+            :username => ceph_args["auth_username"],
+            :secret => secret_attrs
+          }
+          source
+        end
+
+        def iso_disk
+          return nil unless iso_file
+
+          source = "#{iso_dir}/#{iso_file}"
+          return nil if disks.any? { |disk| disk_source_path(disk) == source }
+
+          device_prefix = "sd"
+          device_name = disk_next_name(device_prefix, disk_device_names)
+          address_unit = device_name.to_s.delete_prefix(device_prefix).each_byte.reduce(0) { |sum, byte| sum * 26 + (byte - "a".ord + 1) } - 1
+          Disk.new(:type => "file", :device => "cdrom",
+                   :driver => { :name => "qemu", :type => "raw" },
+                   :source => { :file => source },
+                   :target => { :dev => device_name, :bus => "scsi" },
+                   :readonly => true,
+                   :address => { :type => "drive", :controller => 0, :bus => 0, :unit => address_unit })
+        end
+
+        def disk_device_names
+          disks.filter_map do |disk|
+            target = model_cast(disk, Disk).target
+            target&.dev&.to_sym
+          end
+        end
+
+        def disk_next_name(prefix, device_names)
+          ("a".."zz").each do |letter|
+            name = "#{prefix}#{letter}"
+            return name.to_sym unless device_names.include?(name.to_sym)
+          end
+          raise Fog::Errors::Error.new("Out of disk names for #{prefix}*")
+        end
+
+        def disk_source_path(disk)
+          source = model_cast(disk, Disk).source
+          source&.file&.to_s || source&.dev&.to_sym || source&.name&.to_s
         end
 
         def default_iso_dir
