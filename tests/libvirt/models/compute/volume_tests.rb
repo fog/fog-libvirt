@@ -1,6 +1,6 @@
 Shindo.tests('Fog::Compute[:libvirt] | volume model', ['libvirt']) do
 
-  volume = Fog::Compute[:libvirt].volumes.create(:name => 'fog_test')
+  volume = Fog::Compute[:libvirt].volumes.create(:name => 'fog_test', :capacity => '1G')
 
   tests('The volume model should') do
     tests('have attributes') do
@@ -29,10 +29,12 @@ Shindo.tests('Fog::Compute[:libvirt] | volume model', ['libvirt']) do
 
   tests('Cloning volumes should') do
     test('respond to clone_volume') { volume.respond_to? :clone_volume }
-    new_vol = volume.clone_volume('new_vol')
+    new_vol = volume.clone_volume('fog-test-new_vol')
     # We'd like to test that the :name attr has changed, but it seems that's
     # not possible, so we can at least check the new_vol xml exists properly
     test('succeed') { volume.xml == new_vol.xml }
+  ensure
+    new_vol&.destroy
   end
 
   test('to_xml') do
@@ -42,7 +44,7 @@ Shindo.tests('Fog::Compute[:libvirt] | volume model', ['libvirt']) do
         <volume>
           <name>fog_test</name>
           <allocation unit="G">1</allocation>
-          <capacity unit="G">10</capacity>
+          <capacity unit="G">1</capacity>
           <target>
             <format type="raw"/>
             <permissions>
@@ -55,4 +57,6 @@ Shindo.tests('Fog::Compute[:libvirt] | volume model', ['libvirt']) do
       volume.to_xml == expected
     end
   end
+ensure
+  volume&.destroy
 end

@@ -1,7 +1,9 @@
 Shindo.tests("Fog::Compute[:libvirt] | create_domain request", 'libvirt') do
 
   compute = Fog::Compute[:libvirt]
-  xml = compute.servers.new( :nics => [{:bridge => "br180"}]).to_xml
+
+  server = compute.servers.new(:name => "fog-test-create-server", :nics => [])
+  xml = server.to_xml
 
   tests("Create Domain") do
     response = compute.create_domain(xml)
@@ -17,5 +19,7 @@ Shindo.tests("Fog::Compute[:libvirt] | create_domain request", 'libvirt') do
       test("error should be a kind of Libvirt::Error") { e.kind_of?  Libvirt::Error}
     end
   end
-
+ensure
+  server_uuid = compute.servers.all(:name => server.name).first&.uuid
+  compute.servers.service.vm_action(server_uuid, :destroy) if server_uuid
 end

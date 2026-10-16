@@ -1,6 +1,6 @@
 Shindo.tests('Fog::Compute[:libvirt] | nic model', ['libvirt']) do
 
-  server = Fog::Compute[:libvirt].servers.create(:name => Fog::Mock.random_letters(8))
+  server = Fog::Compute[:libvirt].servers.create(:name => "fog-nic-test-#{Fog::Mock.random_letters(8)}")
   nic = server.nics.first
 
   tests('The nic model should') do
@@ -28,5 +28,6 @@ Shindo.tests('Fog::Compute[:libvirt] | nic model', ['libvirt']) do
     end
     test('be a kind of Fog::Libvirt::Compute::Nic') { nic.kind_of? Fog::Libvirt::Compute::Nic }
   end
-
+ensure
+  server&.destroy(:destroy_volumes => true)
 end

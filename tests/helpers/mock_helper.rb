@@ -2,13 +2,11 @@
 #
 # FOG_MOCK=true fog
 
-if ENV["FOG_MOCK"] == "true"
-  Fog.mock!
+Fog.credentials[:libvirt_uri] = ENV.fetch("FOG_LIBVIRT_URI", "test:///default")
+
+def real_libvirt?
+  Fog.credentials[:libvirt_uri].start_with?("qemu")
 end
 
-# if in mocked mode, fill in some fake credentials for us
-if Fog.mock?
-  Fog.credentials = {
-    :libvirt_uri => 'test:///default',
-  }.merge(Fog.credentials)
-end
+enable_mocking = ENV.fetch("FOG_MOCK") { (!real_libvirt?).to_s }
+Fog.mock! unless ["false", "no", "0"].include?(enable_mocking)

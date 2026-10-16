@@ -34,6 +34,7 @@ end
 #############################################################################
 
 GEM_NAME = "#{name}"
+ENV['COVERAGE'] ||= 'true'
 task :default => [:test, :minitest]
 
 Rake::TestTask.new(:minitest) do |t|
@@ -46,8 +47,7 @@ end
 
 desc 'Run tests'
 task :test do
-  mock = ENV['FOG_MOCK'] || 'true'
-  sh("export FOG_MOCK=#{mock} && bundle exec shindont tests")
+  sh("bundle exec shindont tests")
 end
 
 desc 'Run mocked tests'
@@ -58,6 +58,11 @@ end
 desc 'Run live tests'
 task :live do
   sh("export FOG_MOCK=false && bundle exec shindont tests")
+end
+
+desc 'Run live libvirt qemu:///session tests'
+task :live_session do
+  sh("export FOG_LIBVIRT_URI=qemu:///session && bundle exec rake test minitest")
 end
 
 desc "Open an irb session preloaded with this library"

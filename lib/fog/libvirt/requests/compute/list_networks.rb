@@ -9,7 +9,7 @@ module Fog
               data << network_to_attributes(client.lookup_network_by_name(network_name))
             end
           else
-            data = [network_to_attributes(get_network_by_filter(filter))]
+            data = [network_to_attributes(get_network_by_filter(filter))].compact
           end
           data
         end
@@ -21,6 +21,8 @@ module Fog
             when :uuid
               client.lookup_network_by_uuid(filter[:uuid])
             when :name
+              return nil if filter[:name].nil?
+
               client.lookup_network_by_name(filter[:name])
           end
         end
