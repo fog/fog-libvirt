@@ -475,6 +475,46 @@ module Fog
           args
         end
 
+        DNSMASQ_LEASE_DIR = '/var/lib/libvirt/dnsmasq'.freeze
+
+        # Read IP from a dnsmasq lease file when the libvirt DHCPLeases API
+        # returns nothing.  This happens when DHCP is provided by an external
+        # dnsmasq (not started by libvirt) -- for example, a dnsmasq running
+        # inside a network namespace to work around port conflicts on WSL2.
+        #
+        # dnsmasq lease file format (space-separated):
+        #   <expiry> <mac> <ip> <hostname> [<client-id>]
+        def ip_address_from_leasefile(net, mac)
+          net_name = net.name
+          return nil unless net_name
+
+          lease_file = File.join(DNSMASQ_LEASE_DIR, "#{net_name}.leases")
+          return nil unless File.exist?(lease_file)
+
+          target_mac = mac.to_s.downcase
+          best_expiry = 0
+          best_ip = nil
+
+          begin
+            File.foreach(lease_file) do |line|
+              parts = line.strip.split
+              next unless parts.length >= 4
+
+              expiry = parts[0].to_i
+              lease_mac = parts[1].downcase
+              ip = parts[2]
+              if lease_mac == target_mac && expiry > best_expiry
+                best_expiry = expiry
+                best_ip = ip
+              end
+            end
+          rescue Errno::EACCES, Errno::ENOENT
+            return nil
+          end
+
+          best_ip
+        end
+
         # This retrieves the ip address of the mac address using dhcp_leases
         # It returns an array of public and private ip addresses
         # Currently only one ip address is returned, but in the future this could be multiple
@@ -489,13 +529,32 @@ module Fog
             net = service.networks.all(:name => nic.network).first
             # Assume the lease expiring last is the current IP address
             ip_address = net&.dhcp_leases(nic.mac)&.max_by { |lse| lse["expirytime"] }&.dig("ipaddr")
+
+            # Fallback: when the network has no libvirt-managed DHCP (e.g. an
+            # external dnsmasq running in a network namespace on WSL2), the
+            # DHCPLeases API returns empty.  Read the dnsmasq lease file directly.
+            #
+            # Only attempt this for a local connection: the lease file lives on
+            # the libvirt host's filesystem, so for a remote URI (e.g. qemu+ssh)
+            # we would be reading the client machine's files instead.
+            if ip_address.nil? && net && !service.uri.remote?
+              warn_leasefile_fallback(nic.mac)
+              ip_address = ip_address_from_leasefile(net, nic.mac)
+            end
           end
 
           return { :public => [ip_address], :private => [ip_address] }
         end
 
-        # Locale-friendly removal of non-alpha nums
-        DOMAIN_CLEANUP_REGEXP = Regexp.compile('[\W_-]')
+        # Warn once per MAC (per server instance) when falling back to the
+        # dnsmasq lease file, to avoid log spam on repeated address lookups.
+        def warn_leasefile_fallback(mac)
+          @leasefile_warned_macs ||= {}
+          return if @leasefile_warned_macs[mac]
+
+          Fog::Logger.warning("DHCPLeases API returned no address for #{mac}; falling back to dnsmasq lease file.")
+          @leasefile_warned_macs[mac] = true
+        end
 
         def ip_address(key)
           addresses[key]&.first
